@@ -13,6 +13,7 @@ var installCmd = &cobra.Command{
 	Use:   "install",
 	Short: "Install a CLI",
 	Long:  `Install a CLI application for local use.`,
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		nodeManager := nodeman.NewManager(afero.NewOsFs())
 		node := nodeManager.GetNode("10.16.0")
