@@ -12,6 +12,15 @@
       "program": "${workspaceFolder}/main.go",
       "env": {},
       "args": []
+    },
+    {
+      "name": "install hello-cli",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/main.go",
+      "env": {},
+      "args": ["install","rdaniels6813/hello-cli"]
     }
   ]
 }

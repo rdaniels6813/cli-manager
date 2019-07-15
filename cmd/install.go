@@ -15,12 +15,13 @@ var installCmd = &cobra.Command{
 	Long:  `Install a CLI application for local use.`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		lts := nodeman.GetLatestLTSNodeVersion()
 		nodeManager := nodeman.NewManager(afero.NewOsFs())
-		node := nodeManager.GetNode("10.16.0")
-		err := node.Node("-v")
-		log.Println(err)
-		err = node.Npm("-v")
-		log.Println(err)
+		node := nodeManager.GetNode(lts)
+		err := node.Npm("install", "-g", args[0])
+		if err != nil {
+			log.Fatalf("Failed to install npm CLI: %v", err)
+		}
 	},
 }
 

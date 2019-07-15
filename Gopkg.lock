@@ -10,6 +10,14 @@
   revision = "71eb68cc467c35a70c4b3d0c46b590260fe3f303"
 
 [[projects]]
+  digest = "1:b6d886569181ec96ca83d529f4d6ba0cbf92ace7bb6f633f90c5f34d9bba7aab"
+  name = "github.com/blang/semver"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ba2c2ddd89069b46a7011d4106f6868f17ee1705"
+  version = "v3.6.1"
+
+[[projects]]
   digest = "1:d052bda13fd17bd8cf52ccae57b0a03ffeea80cffc2cffc62741235fa34f92cf"
   name = "github.com/dsnet/compress"
   packages = [
@@ -172,13 +180,23 @@
   revision = "342b2e1fbaa52c93f31447ad2c6abc048c63e475"
   version = "v0.3.2"
 
+[[projects]]
+  branch = "master"
+  digest = "1:465611412356e9e09258032e0c758ef187a1fbb7b16bbaf6b8c8b7ab52289a5a"
+  name = "golang.org/x/tools"
+  packages = ["internal/semver"]
+  pruneopts = "UT"
+  revision = "8b927904ee0dec805c89aaf9172f4459296ed6e8"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/blang/semver",
     "github.com/mholt/archiver",
     "github.com/spf13/afero",
     "github.com/spf13/cobra",
+    "golang.org/x/tools/internal/semver",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
