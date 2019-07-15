@@ -180,14 +180,6 @@
   revision = "342b2e1fbaa52c93f31447ad2c6abc048c63e475"
   version = "v0.3.2"
 
-[[projects]]
-  branch = "master"
-  digest = "1:465611412356e9e09258032e0c758ef187a1fbb7b16bbaf6b8c8b7ab52289a5a"
-  name = "golang.org/x/tools"
-  packages = ["internal/semver"]
-  pruneopts = "UT"
-  revision = "8b927904ee0dec805c89aaf9172f4459296ed6e8"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -196,7 +188,6 @@
     "github.com/mholt/archiver",
     "github.com/spf13/afero",
     "github.com/spf13/cobra",
-    "golang.org/x/tools/internal/semver",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
