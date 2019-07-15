@@ -33,6 +33,7 @@ func (n *nodeLTSSchedule) isLTS() bool {
 	return false
 }
 
+// GetLatestNodeVersion gets the latest even numbered node version
 func GetLatestNodeVersion() string {
 	releases := getNodeReleases()
 	latest := semver.Version{Major: 8}
@@ -48,6 +49,7 @@ func GetLatestNodeVersion() string {
 	return latest.String()
 }
 
+// GetLatestLTSNodeVersion gets the latest LTS version of node.js
 func GetLatestLTSNodeVersion() string {
 	releases := getNodeReleases()
 	latest := semver.Version{Major: 8}
