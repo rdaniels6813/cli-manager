@@ -1,6 +1,7 @@
 package nodeman
 
 import (
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,6 +12,7 @@ import (
 type Node interface {
 	Node(args ...string) error
 	Npm(args ...string) error
+	NpmView(packageString string) (*NpmViewResponse, error)
 }
 
 type nodeImpl struct {
@@ -25,6 +27,22 @@ func (n *nodeImpl) Node(args ...string) error {
 // Npm execute a command using npm with the following arguments `npm args[0] args[1] ...`
 func (n *nodeImpl) Npm(args ...string) error {
 	return command(n.getNpmPath(), args...)
+}
+
+// NpmViewResponse response from npm view command
+type NpmViewResponse struct {
+	Engines map[string]string `json:"engines"`
+}
+
+// Npm execute a command using npm with the following arguments `npm args[0] args[1] ...` returning results as JSON
+func (n *nodeImpl) NpmView(packageString string) (*NpmViewResponse, error) {
+	cmd := exec.Command(n.getNpmPath())
+	cmd.Args = append(cmd.Args, "view", packageString)
+	cmd.Args = append(cmd.Args, "--json")
+	output, err := cmd.Output()
+	var response NpmViewResponse
+	err = json.Unmarshal(output, &response)
+	return &response, err
 }
 
 func command(path string, args ...string) error {

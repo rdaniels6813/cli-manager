@@ -18,11 +18,16 @@ var installCmd = &cobra.Command{
 		lts := nodeman.GetLatestLTSNodeVersion()
 		nodeManager := nodeman.NewManager(afero.NewOsFs())
 		node := nodeManager.GetNode(lts)
-		err := node.Npm("install", "-g", args[0])
+		output, err := node.NpmView(args[0])
 		if err != nil {
 			log.Fatalf("Failed to install npm CLI: %v", err)
 		}
+		log.Println(output)
 	},
+}
+
+func getNodePackageJSON(cliName string) {
+
 }
 
 func init() {
