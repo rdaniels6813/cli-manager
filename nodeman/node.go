@@ -26,6 +26,7 @@ func (n *nodeImpl) Node(args ...string) error {
 
 // Npm execute a command using npm with the following arguments `npm args[0] args[1] ...`
 func (n *nodeImpl) Npm(args ...string) error {
+	command(n.getNpmPath(), "config", "set", "prefix", n.nodePath)
 	return command(n.getNpmPath(), args...)
 }
 

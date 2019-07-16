@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strings"
 
-	"github.com/blang/semver"
+	"github.com/Masterminds/semver"
 )
 
 type nodeLTSSchedule struct {
@@ -36,13 +35,34 @@ func (n *nodeLTSSchedule) isLTS() bool {
 // GetLatestNodeVersion gets the latest even numbered node version
 func GetLatestNodeVersion() string {
 	releases := getNodeReleases()
-	latest := semver.Version{Major: 8}
+	latest, _ := semver.NewVersion("8")
 	for _, schedule := range *releases {
-		version, err := semver.Make(strings.ReplaceAll(schedule.Version, "v", ""))
+		version, err := semver.NewVersion(schedule.Version)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if version.Major%2 == 0 && latest.Compare(version) == -1 {
+		if version.Major()%2 == 0 && latest.LessThan(version) {
+			latest = version
+		}
+	}
+	return latest.String()
+}
+
+// GetNodeVersionByRangeOrLTS return the latest matching node version in the range,
+// or the latest LTS version if the range is invalid
+func GetNodeVersionByRangeOrLTS(engine string) string {
+	versionRange, err := semver.NewConstraint(engine)
+	if err != nil {
+		return GetLatestNodeVersion()
+	}
+	releases := getNodeReleases()
+	latest, _ := semver.NewVersion("8")
+	for _, schedule := range *releases {
+		version, err := semver.NewVersion(schedule.Version)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if version.Major()%2 == 0 && latest.LessThan(version) && versionRange.Check(version) {
 			latest = version
 		}
 	}
@@ -52,9 +72,9 @@ func GetLatestNodeVersion() string {
 // GetLatestLTSNodeVersion gets the latest LTS version of node.js
 func GetLatestLTSNodeVersion() string {
 	releases := getNodeReleases()
-	latest := semver.Version{Major: 8}
+	latest, _ := semver.NewVersion("8")
 	for _, schedule := range *releases {
-		version, err := semver.Make(strings.ReplaceAll(schedule.Version, "v", ""))
+		version, err := semver.NewVersion(schedule.Version)
 		if err != nil {
 			log.Fatal(err)
 		}

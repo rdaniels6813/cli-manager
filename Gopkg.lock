@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:55388fd080150b9a072912f97b1f5891eb0b50df43401f8b75fb4273d3fec9fc"
+  name = "github.com/Masterminds/semver"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c7af12943936e8c39859482e61f0574c2fd7fc75"
+  version = "v1.4.2"
+
+[[projects]]
   branch = "master"
   digest = "1:ef09c94a4b7a61b41034d03a885b1c1e87bf544bcd78a8784c3c0b36e8d00e2e"
   name = "github.com/andybalholm/brotli"
@@ -184,6 +192,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/Masterminds/semver",
     "github.com/blang/semver",
     "github.com/mholt/archiver",
     "github.com/spf13/afero",
