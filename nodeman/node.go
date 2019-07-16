@@ -2,6 +2,7 @@ package nodeman
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -21,13 +22,12 @@ type nodeImpl struct {
 
 // Node execute a command using the node binary with the following arguments `node args[0] args[1] ...`
 func (n *nodeImpl) Node(args ...string) error {
-	return command(n.getNodePath(), args...)
+	return n.command(n.getNodePath(), args...)
 }
 
 // Npm execute a command using npm with the following arguments `npm args[0] args[1] ...`
 func (n *nodeImpl) Npm(args ...string) error {
-	command(n.getNpmPath(), "config", "set", "prefix", n.nodePath)
-	return command(n.getNpmPath(), args...)
+	return n.command(n.getNpmPath(), args...)
 }
 
 // NpmViewResponse response from npm view command
@@ -46,8 +46,9 @@ func (n *nodeImpl) NpmView(packageString string) (*NpmViewResponse, error) {
 	return &response, err
 }
 
-func command(path string, args ...string) error {
+func (n *nodeImpl) command(path string, args ...string) error {
 	cmd := exec.Command(path)
+	cmd.Env = append(cmd.Env, fmt.Sprintf("npm_config_prefix=%s", n.nodePath))
 	cmd.Args = append(cmd.Args, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
