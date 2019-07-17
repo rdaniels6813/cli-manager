@@ -20,7 +20,7 @@
       "mode": "auto",
       "program": "${workspaceFolder}/main.go",
       "env": {},
-      "args": ["install", "rdaniels6813/hello-cli"]
+      "args": ["install", "rdaniels6813/hello-cli#v1.0.0"]
     },
     {
       "name": "install eslint",

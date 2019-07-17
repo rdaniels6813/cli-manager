@@ -3,6 +3,7 @@ package nodeman
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -44,9 +45,25 @@ func (n *nodeImpl) NpmView(packageString string) (*NpmViewResponse, error) {
 	cmd.Args = append(cmd.Args, "view", packageString)
 	cmd.Args = append(cmd.Args, "--json")
 	output, err := cmd.Output()
+	if err != nil {
+		return n.githubPackageJSON(packageString)
+	}
 	var response NpmViewResponse
 	err = json.Unmarshal(output, &response)
 	return &response, err
+}
+
+func (n *nodeImpl) githubPackageJSON(packageString string) (*NpmViewResponse, error) {
+	repoPartialURL := strings.ReplaceAll(packageString, "#", "/")
+	packageJSONURL := fmt.Sprintf("https://raw.githubusercontent.com/%s/package.json", repoPartialURL)
+	var result NpmViewResponse
+	resp, err := http.Get(packageJSONURL)
+	if err != nil {
+		return &result, err
+	}
+	defer resp.Body.Close()
+	json.NewDecoder(resp.Body).Decode(&result)
+	return &result, nil
 }
 
 // BinPath returns the path to the bin directory for the installed node version
