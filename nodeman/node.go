@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 // Node helper for wrapping node commands for a node installation
@@ -14,6 +15,7 @@ type Node interface {
 	Node(args ...string) error
 	Npm(args ...string) error
 	NpmView(packageString string) (*NpmViewResponse, error)
+	BinPath() string
 }
 
 type nodeImpl struct {
@@ -33,6 +35,7 @@ func (n *nodeImpl) Npm(args ...string) error {
 // NpmViewResponse response from npm view command
 type NpmViewResponse struct {
 	Engines map[string]string `json:"engines"`
+	Bin     map[string]string `json:"bin"`
 }
 
 // Npm execute a command using npm with the following arguments `npm args[0] args[1] ...` returning results as JSON
@@ -46,14 +49,26 @@ func (n *nodeImpl) NpmView(packageString string) (*NpmViewResponse, error) {
 	return &response, err
 }
 
+// BinPath returns the path to the bin directory for the installed node version
+func (n *nodeImpl) BinPath() string {
+	return n.getBinPath()
+}
+
 func (n *nodeImpl) command(path string, args ...string) error {
 	cmd := exec.Command(path)
-	cmd.Env = append(cmd.Env, fmt.Sprintf("npm_config_prefix=%s", n.nodePath))
+	cmd.Env = append(os.Environ(), fmt.Sprintf("npm_config_prefix=\"%s\"", strings.ReplaceAll(n.nodePath, "\\", "/")))
 	cmd.Args = append(cmd.Args, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
 	return cmd.Run()
+}
+
+func (n *nodeImpl) getBinPath() string {
+	if runtime.GOOS == "windows" {
+		return n.nodePath
+	}
+	return filepath.Join(n.nodePath, "bin/")
 }
 
 func (n *nodeImpl) getNodePath() string {

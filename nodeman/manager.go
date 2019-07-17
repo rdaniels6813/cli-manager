@@ -1,6 +1,7 @@
 package nodeman
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -52,16 +53,80 @@ func (m *Manager) getNodeURL(version string, os string, arch string) string {
 	return fmt.Sprintf("https://nodejs.org/dist/v%s/node-v%s-%s-%s%s", version, version, os, arch, extension)
 }
 
-func (m *Manager) getNodeBaseFolder() string {
+func (m *Manager) getCliManagerFolder() string {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal("There was an error determining the user home directory")
 	}
-	cliManagerDir := filepath.Join(homeDir, ".cli-manager", "node")
+	cliManagerDir := filepath.Join(homeDir, ".cli-manager")
 	if _, err := m.os.Stat(cliManagerDir); os.IsNotExist(err) {
 		m.os.MkdirAll(cliManagerDir, 0700)
 	}
 	return cliManagerDir
+}
+
+// GetCommandPath gets the path to the installed command
+func (m *Manager) GetCommandPath(bin string) (string, error) {
+	cliManagerDir := m.getCliManagerFolder()
+	installedAppsJSON := filepath.Join(cliManagerDir, "installed.json")
+	config := loadConfig(installedAppsJSON)
+
+	for k, v := range config {
+		if k == bin {
+			if runtime.GOOS == "windows" {
+				return filepath.Join(v, fmt.Sprintf("%s.cmd", k)), nil
+			}
+			return filepath.Join(v, fmt.Sprintf("%s", k)), nil
+		}
+	}
+	return "", fmt.Errorf("%s is not installed", bin)
+}
+
+// MarkInstalled marks the current binaries installed with their paths
+func (m *Manager) MarkInstalled(bins map[string]string, binpath string) error {
+	cliManagerDir := m.getCliManagerFolder()
+	installedAppsJSON := filepath.Join(cliManagerDir, "installed.json")
+	config := loadConfig(installedAppsJSON)
+	for k := range bins {
+		config[k] = binpath
+	}
+	return saveConfig(installedAppsJSON, config)
+}
+
+func saveConfig(path string, config map[string]string) error {
+	f, err := os.Create(path)
+	defer f.Close()
+	if err != nil {
+		return err
+	}
+	err = json.NewEncoder(f).Encode(config)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func loadConfig(path string) map[string]string {
+	f, err := os.Open(path)
+	defer f.Close()
+	if err != nil {
+		return make(map[string]string)
+	}
+	var result map[string]string
+	err = json.NewDecoder(f).Decode(&result)
+	if err != nil {
+		return make(map[string]string)
+	}
+	return result
+}
+
+func (m *Manager) getNodeBaseFolder() string {
+	cliManagerDir := m.getCliManagerFolder()
+	nodeFolder := filepath.Join(cliManagerDir, "node")
+	if _, err := m.os.Stat(nodeFolder); os.IsNotExist(err) {
+		m.os.MkdirAll(nodeFolder, 0700)
+	}
+	return nodeFolder
 }
 
 func (m *Manager) downloadNodeArchive(version string) string {

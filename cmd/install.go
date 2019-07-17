@@ -20,7 +20,8 @@ var installCmd = &cobra.Command{
 		engine := output.Engines["node"]
 		version := nodeman.GetNodeVersionByRangeOrLTS(engine)
 		installNode := nodeManager.GetNode(version)
-		installNode.Npm("install", "-g", "eslint")
+		installNode.Npm("install", "-g", args[0])
+		nodeManager.MarkInstalled(output.Bin, installNode.BinPath())
 	},
 }
 
