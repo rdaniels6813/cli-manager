@@ -39,6 +39,15 @@
       "program": "${workspaceFolder}/main.go",
       "env": {},
       "args": ["run", "eslint", "-h"]
+    },
+    {
+      "name": "powershell completion",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/main.go",
+      "env": {},
+      "args": ["completion", "-p"]
     }
   ]
 }
