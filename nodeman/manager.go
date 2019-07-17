@@ -28,6 +28,23 @@ func NewManager(os afero.Fs) *Manager {
 	return &Manager{os: os}
 }
 
+// CLIApp config for an installed CLI app
+type CLIApp struct {
+	Bin  string `json:"bin"`
+	Path string `json:"path"`
+}
+
+// GetInstalledApps list all of the installed apps
+func (m *Manager) GetInstalledApps() []string {
+	configPath := m.getConfigPath()
+	apps := loadConfig(configPath)
+	var result []string
+	for app := range apps {
+		result = append(result, app)
+	}
+	return result
+}
+
 // GetNode Ensures the node binary is downloaded & extracted and returns the path to the bin folder
 func (m *Manager) GetNode(version string) Node {
 	destinationPath := m.getNodeOutputFolder(version)
@@ -74,26 +91,30 @@ func (m *Manager) GetCommandPath(bin string) (string, error) {
 	for k, v := range config {
 		if k == bin {
 			if runtime.GOOS == "windows" {
-				return filepath.Join(v, fmt.Sprintf("%s.cmd", k)), nil
+				return filepath.Join(v.Path, fmt.Sprintf("%s.cmd", k)), nil
 			}
-			return filepath.Join(v, fmt.Sprintf("%s", k)), nil
+			return filepath.Join(v.Path, fmt.Sprintf("%s", k)), nil
 		}
 	}
 	return "", fmt.Errorf("%s is not installed", bin)
 }
 
+func (m *Manager) getConfigPath() string {
+	cliManagerDir := m.getCliManagerFolder()
+	return filepath.Join(cliManagerDir, "installed.json")
+}
+
 // MarkInstalled marks the current binaries installed with their paths
 func (m *Manager) MarkInstalled(bins map[string]string, binpath string) error {
-	cliManagerDir := m.getCliManagerFolder()
-	installedAppsJSON := filepath.Join(cliManagerDir, "installed.json")
+	installedAppsJSON := m.getConfigPath()
 	config := loadConfig(installedAppsJSON)
 	for k := range bins {
-		config[k] = binpath
+		config[k] = &CLIApp{Path: binpath, Bin: k}
 	}
 	return saveConfig(installedAppsJSON, config)
 }
 
-func saveConfig(path string, config map[string]string) error {
+func saveConfig(path string, config map[string]*CLIApp) error {
 	f, err := os.Create(path)
 	defer f.Close()
 	if err != nil {
@@ -106,16 +127,16 @@ func saveConfig(path string, config map[string]string) error {
 	return nil
 }
 
-func loadConfig(path string) map[string]string {
+func loadConfig(path string) map[string]*CLIApp {
 	f, err := os.Open(path)
 	defer f.Close()
 	if err != nil {
-		return make(map[string]string)
+		return make(map[string]*CLIApp)
 	}
-	var result map[string]string
+	var result map[string]*CLIApp
 	err = json.NewDecoder(f).Decode(&result)
 	if err != nil {
-		return make(map[string]string)
+		return make(map[string]*CLIApp)
 	}
 	return result
 }

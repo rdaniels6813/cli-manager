@@ -57,11 +57,13 @@ func (n *nodeImpl) NpmView(packageString string) (*NpmViewResponse, error) {
 
 func (n *nodeImpl) githubPackageJSON(packageString string) (*NpmViewResponse, error) {
 	branchIndex := strings.Index(packageString, "#")
+	branch := ""
 	if branchIndex == -1 {
 		branchIndex = len(packageString)
+	} else {
+		branch = packageString[branchIndex+1:]
 	}
 	repoPartialURL := packageString[:branchIndex]
-	branch := packageString[branchIndex+1:]
 	packageJSONURL := fmt.Sprintf("https://api.github.com/repos/%s/contents/package.json", repoPartialURL)
 	if branch != "" {
 		packageJSONURL = fmt.Sprintf("%s?ref=%s", packageJSONURL, branch)
@@ -71,7 +73,10 @@ func (n *nodeImpl) githubPackageJSON(packageString string) (*NpmViewResponse, er
 	if err != nil {
 		return &result, err
 	}
-	req.Header.Set("Authorization", fmt.Sprintf("token %s", os.Getenv("GH_TOKEN")))
+	token := os.Getenv("GH_TOKEN")
+	if token != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("token %s", os.Getenv("GH_TOKEN")))
+	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return &result, err

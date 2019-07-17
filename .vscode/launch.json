@@ -20,7 +20,10 @@
       "mode": "auto",
       "program": "${workspaceFolder}/main.go",
       "env": {},
-      "args": ["install", "rdaniels6813/hello-cli#v1.0.0"]
+      "args": [
+        "install",
+        "rdaniels6813/hello-cli#v1.0.0"
+      ]
     },
     {
       "name": "install eslint",
@@ -29,7 +32,10 @@
       "mode": "auto",
       "program": "${workspaceFolder}/main.go",
       "env": {},
-      "args": ["install", "eslint"]
+      "args": [
+        "install",
+        "eslint"
+      ]
     },
     {
       "name": "run eslint -h",
@@ -38,7 +44,11 @@
       "mode": "auto",
       "program": "${workspaceFolder}/main.go",
       "env": {},
-      "args": ["run", "eslint", "-h"]
+      "args": [
+        "run",
+        "eslint",
+        "-h"
+      ]
     },
     {
       "name": "powershell completion",
@@ -47,7 +57,36 @@
       "mode": "auto",
       "program": "${workspaceFolder}/main.go",
       "env": {},
-      "args": ["completion", "-p"]
+      "args": [
+        "completion",
+        "-p"
+      ]
+    },
+    {
+      "name": "zsh completion",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/main.go",
+      "env": {},
+      "args": [
+        "completion",
+        "-z",
+        "-g"
+      ]
+    },
+    {
+      "name": "zsh aliases",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/main.go",
+      "env": {},
+      "args": [
+        "aliases",
+        "-z",
+        "-g"
+      ]
     }
   ]
 }
