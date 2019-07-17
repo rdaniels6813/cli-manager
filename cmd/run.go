@@ -15,9 +15,11 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/spf13/afero"
 	"lab.bittrd.com/bittrd/cli-manager/nodeman"
@@ -40,7 +42,20 @@ var runCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
+		nodeBinPath, err := manager.GetCommandNodeBinPath(command)
+		if err != nil {
+			log.Fatal(err)
+		}
 		runCommand := exec.Command(commandPath, remainingArgs...)
+		var env []string
+		for _, val := range os.Environ() {
+			name := strings.Split(val, "=")[0]
+			if strings.ToLower(name) == "path" {
+				val = fmt.Sprintf("%s=%s%s%s", name, nodeBinPath, string(os.PathListSeparator), os.Getenv("PATH"))
+			}
+			env = append(env, val)
+		}
+		runCommand.Env = env
 		runCommand.Stdout = os.Stdout
 		runCommand.Stdin = os.Stdin
 		runCommand.Stderr = os.Stderr

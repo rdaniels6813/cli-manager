@@ -38,7 +38,7 @@ func handleZshAliases(generate bool) {
 		manager := nodeman.NewManager(afero.NewOsFs())
 		apps := manager.GetInstalledApps()
 		for _, app := range apps {
-			fmt.Printf("alias %s='cli-manager run %s'", app, app)
+			fmt.Printf("alias %s='cli-manager run %s'\n", app, app)
 		}
 	} else {
 		fmt.Printf("Add the following line to your .zshrc file:\n\nsource <(cli-manager aliases -g -z)")

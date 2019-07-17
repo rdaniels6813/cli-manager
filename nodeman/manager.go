@@ -99,6 +99,20 @@ func (m *Manager) GetCommandPath(bin string) (string, error) {
 	return "", fmt.Errorf("%s is not installed", bin)
 }
 
+// GetCommandNodeBinPath returns the bin folder path to the node installation being used for the command
+func (m *Manager) GetCommandNodeBinPath(bin string) (string, error) {
+	cliManagerDir := m.getCliManagerFolder()
+	installedAppsJSON := filepath.Join(cliManagerDir, "installed.json")
+	config := loadConfig(installedAppsJSON)
+
+	for k, v := range config {
+		if k == bin {
+			return v.Path, nil
+		}
+	}
+	return "", fmt.Errorf("%s is not installed", bin)
+}
+
 func (m *Manager) getConfigPath() string {
 	cliManagerDir := m.getCliManagerFolder()
 	return filepath.Join(cliManagerDir, "installed.json")
