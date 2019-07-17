@@ -1,8 +1,10 @@
 package nodeman
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -54,16 +56,45 @@ func (n *nodeImpl) NpmView(packageString string) (*NpmViewResponse, error) {
 }
 
 func (n *nodeImpl) githubPackageJSON(packageString string) (*NpmViewResponse, error) {
-	repoPartialURL := strings.ReplaceAll(packageString, "#", "/")
-	packageJSONURL := fmt.Sprintf("https://raw.githubusercontent.com/%s/package.json", repoPartialURL)
+	branchIndex := strings.Index(packageString, "#")
+	if branchIndex == -1 {
+		branchIndex = len(packageString)
+	}
+	repoPartialURL := packageString[:branchIndex]
+	branch := packageString[branchIndex+1:]
+	packageJSONURL := fmt.Sprintf("https://api.github.com/repos/%s/contents/package.json", repoPartialURL)
+	if branch != "" {
+		packageJSONURL = fmt.Sprintf("%s?ref=%s", packageJSONURL, branch)
+	}
 	var result NpmViewResponse
-	resp, err := http.Get(packageJSONURL)
+	req, err := http.NewRequest("GET", packageJSONURL, nil)
 	if err != nil {
 		return &result, err
 	}
+	req.Header.Set("Authorization", fmt.Sprintf("token %s", os.Getenv("GH_TOKEN")))
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return &result, err
+	}
+	if resp.StatusCode != 200 {
+		log.Fatalf("Failed to get package.json for project using: %s, please ensure you have set up your github token", packageJSONURL)
+	}
 	defer resp.Body.Close()
-	json.NewDecoder(resp.Body).Decode(&result)
+	var content githubContent
+	json.NewDecoder(resp.Body).Decode(&content)
+	decoded, err := base64.StdEncoding.DecodeString(content.Content)
+	if err != nil {
+		return &result, nil
+	}
+	err = json.Unmarshal(decoded, &result)
+	if err != nil {
+		return &result, nil
+	}
 	return &result, nil
+}
+
+type githubContent struct {
+	Content string `json:"content"`
 }
 
 // BinPath returns the path to the bin directory for the installed node version
