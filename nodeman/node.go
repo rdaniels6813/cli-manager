@@ -109,7 +109,15 @@ func (n *nodeImpl) BinPath() string {
 
 func (n *nodeImpl) command(path string, args ...string) error {
 	cmd := exec.Command(path)
-	cmd.Env = append(os.Environ(), fmt.Sprintf("npm_config_prefix=\"%s\"", strings.ReplaceAll(n.nodePath, "\\", "/")))
+	var env []string
+	for _, val := range os.Environ() {
+		name := strings.Split(val, "=")[0]
+		if strings.ToLower(name) == "path" {
+			val = fmt.Sprintf("%s=%s%s%s", name, filepath.Dir(path), string(os.PathListSeparator), os.Getenv("PATH"))
+		}
+		env = append(env, val)
+	}
+	cmd.Env = env
 	cmd.Args = append(cmd.Args, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

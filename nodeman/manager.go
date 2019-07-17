@@ -8,8 +8,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/spf13/afero"
 
@@ -97,6 +99,24 @@ func (m *Manager) GetCommandPath(bin string) (string, error) {
 		}
 	}
 	return "", fmt.Errorf("%s is not installed", bin)
+}
+
+// ConfigureNodeOnCommand configures a command to use the appropriate PATH
+// var for the node version required by a command
+func (m *Manager) ConfigureNodeOnCommand(command string, cmd *exec.Cmd) {
+	nodeBinPath, err := m.GetCommandNodeBinPath(command)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var env []string
+	for _, val := range os.Environ() {
+		name := strings.Split(val, "=")[0]
+		if strings.ToLower(name) == "path" {
+			val = fmt.Sprintf("%s=%s%s%s", name, nodeBinPath, string(os.PathListSeparator), os.Getenv("PATH"))
+		}
+		env = append(env, val)
+	}
+	cmd.Env = env
 }
 
 // GetCommandNodeBinPath returns the bin folder path to the node installation being used for the command
