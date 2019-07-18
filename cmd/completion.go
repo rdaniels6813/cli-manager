@@ -61,9 +61,9 @@ func handleZshCompletion(generate bool, install bool) {
 			log.Fatal(err)
 		}
 		if wrote {
-			fmt.Printf("Wrote completion script to: %s", scriptPath)
+			fmt.Printf("Wrote completion script to: %s\n", scriptPath)
 		} else {
-			fmt.Printf("Already installed in: %s", scriptPath)
+			fmt.Printf("Completion already installed in: %s\n", scriptPath)
 		}
 	} else {
 		fmt.Printf("Add the following line to your .zshrc file:\n\n%s", zshCompletionSnippet)
@@ -84,9 +84,9 @@ func handleBashCompletion(generate bool, install bool) {
 			log.Fatal(err)
 		}
 		if wrote {
-			fmt.Printf("Wrote completion script to: %s", scriptPath)
+			fmt.Printf("Wrote completion script to: %s\n", scriptPath)
 		} else {
-			fmt.Printf("Already installed in: %s", scriptPath)
+			fmt.Printf("Completion already installed in: %s\n", scriptPath)
 		}
 	} else {
 		fmt.Printf("Add the following line to your .bashrc or .profile file:\n\n%s", bashCompletionSnippet)
@@ -103,9 +103,9 @@ func handlePowershellCompletion(generate bool, install bool, core bool) {
 			log.Fatal(err)
 		}
 		if wrote {
-			fmt.Printf("Wrote completion script to: %s", scriptPath)
+			fmt.Printf("Wrote completion script to: %s\n", scriptPath)
 		} else {
-			fmt.Printf("Already installed in: %s", scriptPath)
+			fmt.Printf("Completion already installed in: %s\n", scriptPath)
 		}
 	} else {
 		fmt.Printf("Add the following line to your $PROFILE file:\n\n%s", powershellCompletionSnippet)

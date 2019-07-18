@@ -59,9 +59,9 @@ func handleZshAliases(generate bool, install bool) {
 			log.Fatal(err)
 		}
 		if wrote {
-			fmt.Printf("Wrote aliases script to: %s", scriptPath)
+			fmt.Printf("Wrote aliases script to: %s\n", scriptPath)
 		} else {
-			fmt.Printf("Already installed in: %s", scriptPath)
+			fmt.Printf("Aliases already installed in: %s\n", scriptPath)
 		}
 	} else {
 		fmt.Printf("Add the following line to your .zshrc file:\n\n%s", zshAliasesSnippet)
@@ -86,9 +86,9 @@ func handleBashAliases(generate bool, install bool) {
 			log.Fatal(err)
 		}
 		if wrote {
-			fmt.Printf("Wrote aliases script to: %s", scriptPath)
+			fmt.Printf("Wrote aliases script to: %s\n", scriptPath)
 		} else {
-			fmt.Printf("Already installed in: %s", scriptPath)
+			fmt.Printf("Aliases already installed in: %s\n", scriptPath)
 		}
 	} else {
 		fmt.Printf("Add the following line to your .bashrc or .profile file:\n\n%s", bashAliasesSnippet)
@@ -109,9 +109,9 @@ func handlePowershellAliases(generate bool, install bool, core bool) {
 			log.Fatal(err)
 		}
 		if wrote {
-			fmt.Printf("Wrote aliases script to: %s", scriptPath)
+			fmt.Printf("Wrote aliases script to: %s\n", scriptPath)
 		} else {
-			fmt.Printf("Already installed in: %s", scriptPath)
+			fmt.Printf("Aliases already installed in: %s\n", scriptPath)
 		}
 	} else {
 		fmt.Printf("Add the following line to your $PROFILE file:\n\n%s", powershellAliasesSnippet)
