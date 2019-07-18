@@ -1,11 +1,14 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -18,48 +21,92 @@ var completionCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		gen, _ := cmd.Flags().GetBool("generate")
+		install, _ := cmd.Flags().GetBool("install")
 		shellType := getShellType(cmd)
 
 		switch shellType {
 		case Zsh:
-			handleZsh(gen)
+			handleZshCompletion(gen, install)
 		case Bash:
-			handleBash(gen)
+			handleBashCompletion(gen, install)
 		case Powershell:
-			handlePowershell(gen)
+			handlePowershellCompletion(gen, install, false)
+		case PowershellCore:
+			handlePowershellCompletion(gen, install, true)
 		}
 	},
 }
 
-func handleZsh(generate bool) {
+const zshCompletionSnippet = "source <(cli-manager completion -g -z)"
+const bashCompletionSnippet = "source <(cli-manager completion -g -b)"
+const powershellCompletionSnippet = "Invoke-Expression $($(cli-manager.exe completion -g -p) -join \"`n\")"
+
+func handleZshCompletion(generate bool, install bool) {
 	if generate {
 		var data []byte
 		buf := bytes.NewBuffer(data)
 		rootCmd.GenZshCompletion(buf)
 		output, _ := ioutil.ReadAll(buf)
 		fmt.Print(strings.TrimPrefix(string(output), "#"))
+	} else if install {
+		dir, err := os.UserHomeDir()
+		if err != nil {
+			log.Fatal(err)
+		}
+		scriptPath := filepath.Join(dir, ".zshrc")
+		wrote, err := writeShellSnippet(zshCompletionSnippet, scriptPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if wrote {
+			fmt.Printf("Wrote completion script to: %s", scriptPath)
+		} else {
+			fmt.Printf("Already installed in: %s", scriptPath)
+		}
 	} else {
-		fmt.Printf("Add the following line to your .zshrc file:\n\nsource <(cli-manager completion -g -z)")
+		fmt.Printf("Add the following line to your .zshrc file:\n\n%s", zshCompletionSnippet)
 	}
 }
 
-func handleBash(generate bool) {
+func handleBashCompletion(generate bool, install bool) {
 	if generate {
-		var data []byte
-		buf := bytes.NewBuffer(data)
-		rootCmd.GenBashCompletion(buf)
-		output, _ := ioutil.ReadAll(buf)
-		log.Println(string(output))
+		rootCmd.GenBashCompletion(os.Stdout)
+	} else if install {
+		dir, err := os.UserHomeDir()
+		if err != nil {
+			log.Fatal(err)
+		}
+		scriptPath := filepath.Join(dir, ".bashrc")
+		wrote, err := writeShellSnippet(bashCompletionSnippet, scriptPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if wrote {
+			fmt.Printf("Wrote completion script to: %s", scriptPath)
+		} else {
+			fmt.Printf("Already installed in: %s", scriptPath)
+		}
 	} else {
-		fmt.Printf("Add the following line to your .bashrc or .profile file:\n\n")
+		fmt.Printf("Add the following line to your .bashrc or .profile file:\n\n%s", bashCompletionSnippet)
 	}
 }
 
-func handlePowershell(generate bool) {
+func handlePowershellCompletion(generate bool, install bool, core bool) {
 	if generate {
 		rootCmd.GenPowerShellCompletion(os.Stdout)
+	} else if install {
+		scriptPath := getPowershellProfilePath(core)
+		wrote, err := writeShellSnippet(powershellCompletionSnippet, scriptPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if wrote {
+			fmt.Printf("Wrote completion script to: %s", scriptPath)
+		} else {
+			fmt.Printf("Already installed in: %s", scriptPath)
+		}
 	} else {
-		fmt.Printf("Add the following line to your $PROFILE file:\n\n")
+		fmt.Printf("Add the following line to your $PROFILE file:\n\n%s", powershellCompletionSnippet)
 	}
 }
 
@@ -71,7 +118,9 @@ const (
 	// Bash enum for the bash shell
 	Bash shellType = "bash"
 	// Powershell enum for powershell
-	Powershell shellType = "pwsh"
+	Powershell shellType = "powershell"
+	// PowershellCore enum for powershell
+	PowershellCore shellType = "pwsh"
 	// Unknown enum for unknown or unsupported shell
 	Unknown shellType = "unknown"
 )
@@ -80,22 +129,96 @@ func getShellType(cmd *cobra.Command) shellType {
 	zsh, _ := cmd.Flags().GetBool("zsh")
 	powershell, _ := cmd.Flags().GetBool("powershell")
 	bash, _ := cmd.Flags().GetBool("bash")
-	if zsh || os.Getenv("ZSH_NAME") != "" {
+	powershellCore, _ := cmd.Flags().GetBool("pwsh")
+	if zsh {
 		return Zsh
 	}
-	if bash || os.Getenv("BASH") != "" {
+	if bash {
 		return Bash
 	}
-	if powershell || os.Getenv("PSModulePath") != "" {
+	if powershell {
+		return Powershell
+	}
+	if powershellCore {
+		return PowershellCore
+	}
+	if os.Getenv("ZSH_NAME") != "" {
+		return Zsh
+	}
+	if os.Getenv("BASH") != "" {
+		return Bash
+	}
+	psModule := os.Getenv("PSModulePath")
+	if psModule != "" {
+		if strings.Contains(strings.ToLower(psModule), fmt.Sprintf("%spowershell%s", os.PathSeparator)) {
+			return PowershellCore
+		}
 		return Powershell
 	}
 	return Unknown
 }
 
+func getPowershellProfilePath(core bool) string {
+	dir, _ := os.UserHomeDir()
+	onedrivePath := os.Getenv("ONEDRIVE")
+	myDocuments := ""
+	if onedrivePath != "" {
+		myDocuments = filepath.Join(onedrivePath, "Documents")
+	}
+	if _, err := os.Stat(myDocuments); os.IsNotExist(err) {
+		myDocuments = filepath.Join(dir, "My Documents")
+		if _, err = os.Stat(myDocuments); os.IsNotExist(err) {
+			myDocuments = filepath.Join(dir, "Documents")
+		}
+	}
+	if core {
+		switch runtime.GOOS {
+		case "windows":
+			return filepath.Join(myDocuments, "PowerShell", "Microsoft.PowerShell_profile.ps1")
+		case "linux":
+			return filepath.Join(dir, ".config", "powershell", "Microsoft.PowerShell_profile.ps1")
+		case "darwin":
+			fmt.Print("This is untested on macos with powershell core")
+			return filepath.Join(dir, ".config", "powershell", "Microsoft.PowerShell_profile.ps1")
+		}
+
+	}
+	return filepath.Join(myDocuments, "PowerShell", "Microsoft.PowerShell_profile.ps1")
+}
+
+func writeShellSnippet(snippet string, path string) (bool, error) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err := os.MkdirAll(filepath.Dir(path), 777)
+		if err != nil {
+			return false, err
+		}
+		f, err := os.Create(path)
+		if err != nil {
+			return false, err
+		}
+		_, err = f.WriteString(snippet)
+		return true, err
+	}
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+	if err != nil {
+		return false, err
+	}
+	reader := bufio.NewReader(f)
+	for line, _, err := reader.ReadLine(); err == nil; {
+		if strings.Contains(string(line), snippet) {
+			return false, nil
+		}
+	}
+	_, err = f.WriteString(fmt.Sprintf("%s\n", snippet))
+	return true, err
+}
+
 func init() {
 	rootCmd.AddCommand(completionCmd)
 	completionCmd.Flags().BoolP("powershell", "p", false, "Generate powershell completion")
+	completionCmd.Flags().BoolP("pwsh", "c", false, "Generate powershell core completion")
 	completionCmd.Flags().BoolP("bash", "b", false, "Generate bash completion")
 	completionCmd.Flags().BoolP("zsh", "z", false, "Generate zsh completion")
 	completionCmd.Flags().BoolP("generate", "g", false, "Generate completion for shell specified by $SHELL and send to stdout")
+	completionCmd.Flags().BoolP("install", "i", false, "Install the completion script into the users profile")
 }

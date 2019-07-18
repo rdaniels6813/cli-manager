@@ -99,6 +99,30 @@
         "-z",
         "-g"
       ]
+    },
+    {
+      "name": "install completion",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/main.go",
+      "env": {},
+      "args": [
+        "completion",
+        "-i"
+      ]
+    },
+    {
+      "name": "install aliases",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/main.go",
+      "env": {},
+      "args": [
+        "aliases",
+        "-i"
+      ]
     }
   ]
 }
