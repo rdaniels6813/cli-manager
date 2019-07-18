@@ -31,6 +31,8 @@ var aliasesCmd = &cobra.Command{
 			handlePowershellAliases(gen, install, false)
 		case PowershellCore:
 			handlePowershellAliases(gen, install, true)
+		case Unknown:
+			log.Fatal("Unknown shell, please specify your shell using flags")
 		}
 	},
 }

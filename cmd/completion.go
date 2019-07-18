@@ -33,6 +33,8 @@ var completionCmd = &cobra.Command{
 			handlePowershellCompletion(gen, install, false)
 		case PowershellCore:
 			handlePowershellCompletion(gen, install, true)
+		case Unknown:
+			log.Fatal("Unknown shell, please specify your shell using flags")
 		}
 	},
 }
@@ -150,7 +152,7 @@ func getShellType(cmd *cobra.Command) shellType {
 	}
 	psModule := os.Getenv("PSModulePath")
 	if psModule != "" {
-		if strings.Contains(strings.ToLower(psModule), fmt.Sprintf("%spowershell%s", os.PathSeparator)) {
+		if strings.Contains(strings.ToLower(psModule), fmt.Sprintf("%spowershell%s", string(os.PathSeparator), string(os.PathSeparator))) {
 			return PowershellCore
 		}
 		return Powershell
@@ -193,6 +195,7 @@ func writeShellSnippet(snippet string, path string) (bool, error) {
 			return false, err
 		}
 		f, err := os.Create(path)
+		defer f.Close()
 		if err != nil {
 			return false, err
 		}
@@ -200,6 +203,7 @@ func writeShellSnippet(snippet string, path string) (bool, error) {
 		return true, err
 	}
 	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+	defer f.Close()
 	if err != nil {
 		return false, err
 	}
