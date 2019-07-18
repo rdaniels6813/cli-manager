@@ -144,7 +144,7 @@ func getShellType(cmd *cobra.Command) shellType {
 	if powershellCore {
 		return PowershellCore
 	}
-	if os.Getenv("ZSH_NAME") != "" {
+	if os.Getenv("ZSH_NAME") != "" || os.Getenv("ZSH") != "" {
 		return Zsh
 	}
 	if os.Getenv("BASH") != "" {
@@ -207,9 +207,10 @@ func writeShellSnippet(snippet string, path string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	reader := bufio.NewReader(f)
-	for line, _, err := reader.ReadLine(); err == nil; {
-		if strings.Contains(string(line), snippet) {
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		text := scanner.Text()
+		if strings.Contains(text, snippet) {
 			return false, nil
 		}
 	}
