@@ -37,9 +37,9 @@ var aliasesCmd = &cobra.Command{
 	},
 }
 
-const zshAliasesSnippet = "source <(cli-manager aliases -g -z)"
-const bashAliasesSnippet = "source <(cli-manager aliases -g -b)"
-const powershellAliasesSnippet = "Invoke-Expression $($(cli-manager.exe aliases -g -p) -join \"`n\")"
+const zshAliasesSnippet = "source <(cli-manager aliases -g -z)\n"
+const bashAliasesSnippet = "source <(cli-manager aliases -g -b)\n"
+const powershellAliasesSnippet = "Invoke-Expression $($(cli-manager.exe aliases -g -p) -join \"`n\")\n"
 
 func handleZshAliases(generate bool, install bool) {
 	if generate {

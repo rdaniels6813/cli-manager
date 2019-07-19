@@ -39,9 +39,9 @@ var completionCmd = &cobra.Command{
 	},
 }
 
-const zshCompletionSnippet = "source <(cli-manager completion -g -z)"
-const bashCompletionSnippet = "source <(cli-manager completion -g -b)"
-const powershellCompletionSnippet = "Invoke-Expression $($(cli-manager.exe completion -g -p) -join \"`n\")"
+const zshCompletionSnippet = "source <(cli-manager completion -g -z)\n"
+const bashCompletionSnippet = "source <(cli-manager completion -g -b)\n"
+const powershellCompletionSnippet = "Invoke-Expression $($(cli-manager.exe completion -g -p) -join \"`n\")\n"
 
 func handleZshCompletion(generate bool, install bool) {
 	if generate {
@@ -162,11 +162,7 @@ func getShellType(cmd *cobra.Command) shellType {
 
 func getPowershellProfilePath(core bool) string {
 	dir, _ := os.UserHomeDir()
-	onedrivePath := os.Getenv("ONEDRIVE")
 	myDocuments := ""
-	if onedrivePath != "" {
-		myDocuments = filepath.Join(onedrivePath, "Documents")
-	}
 	if _, err := os.Stat(myDocuments); os.IsNotExist(err) {
 		myDocuments = filepath.Join(dir, "My Documents")
 		if _, err = os.Stat(myDocuments); os.IsNotExist(err) {
