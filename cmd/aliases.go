@@ -44,7 +44,7 @@ const powershellAliasesSnippet = "Invoke-Expression $($(cli-manager.exe aliases 
 func handleZshAliases(generate bool, install bool) {
 	if generate {
 		manager := nodeman.NewManager(afero.NewOsFs())
-		apps := manager.GetInstalledApps()
+		apps := manager.GetInstalledExecutables()
 		for _, app := range apps {
 			fmt.Printf("alias %s='cli-manager run %s'\n", app, app)
 		}
@@ -71,7 +71,7 @@ func handleZshAliases(generate bool, install bool) {
 func handleBashAliases(generate bool, install bool) {
 	if generate {
 		manager := nodeman.NewManager(afero.NewOsFs())
-		apps := manager.GetInstalledApps()
+		apps := manager.GetInstalledExecutables()
 		for _, app := range apps {
 			fmt.Printf("alias %s='cli-manager run %s'\n", app, app)
 		}
@@ -98,7 +98,7 @@ func handleBashAliases(generate bool, install bool) {
 func handlePowershellAliases(generate bool, install bool, core bool) {
 	if generate {
 		manager := nodeman.NewManager(afero.NewOsFs())
-		apps := manager.GetInstalledApps()
+		apps := manager.GetInstalledExecutables()
 		for _, app := range apps {
 			fmt.Printf("function %s { cli-manager.exe run %s @args }", app, app)
 		}

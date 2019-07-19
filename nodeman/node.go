@@ -37,6 +37,7 @@ func (n *nodeImpl) Npm(args ...string) error {
 
 // NpmViewResponse response from npm view command
 type NpmViewResponse struct {
+	Name    string            `json:"name"`
 	Engines map[string]string `json:"engines"`
 	Bin     map[string]string `json:"bin"`
 }

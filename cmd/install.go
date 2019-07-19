@@ -21,7 +21,7 @@ var installCmd = &cobra.Command{
 		version := nodeman.GetNodeVersionByRangeOrLTS(engine)
 		installNode := nodeManager.GetNode(version)
 		installNode.Npm("install", "-g", args[0])
-		nodeManager.MarkInstalled(output.Bin, installNode.BinPath())
+		nodeManager.MarkInstalled(output.Name, output.Bin, installNode.BinPath(), args[0])
 	},
 }
 

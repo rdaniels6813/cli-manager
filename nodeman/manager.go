@@ -32,12 +32,14 @@ func NewManager(os afero.Fs) *Manager {
 
 // CLIApp config for an installed CLI app
 type CLIApp struct {
-	Bin  string `json:"bin"`
-	Path string `json:"path"`
+	App         string `json:"app"`
+	Bin         string `json:"bin"`
+	Path        string `json:"path"`
+	InstallName string `json:"install_name"`
 }
 
-// GetInstalledApps list all of the installed apps
-func (m *Manager) GetInstalledApps() []string {
+// GetInstalledExecutables list all of the installed app executables
+func (m *Manager) GetInstalledExecutables() []string {
 	configPath := m.getConfigPath()
 	apps := loadConfig(configPath)
 	var result []string
@@ -55,6 +57,28 @@ func (m *Manager) GetNode(version string) Node {
 		m.unpackNodeArchive(archivePath, version)
 	}
 	return newNode(destinationPath)
+}
+
+// GetNodeByPath uses the binpath to set up a node helper
+func (m *Manager) GetNodeByPath(path string) Node {
+	return newNode(path)
+}
+
+// GetCLIApp gets the configuration for the cli app by name
+func (m *Manager) GetCLIApp(appName string) (*CLIApp, error) {
+	configPath := m.getConfigPath()
+	apps := loadConfig(configPath)
+	for _, app := range apps {
+		if app.App == appName {
+			return app, nil
+		}
+	}
+	for _, app := range apps {
+		if app.InstallName == appName {
+			return app, nil
+		}
+	}
+	return nil, fmt.Errorf("App is not installed: %s", appName)
 }
 
 func (m *Manager) getNodeURL(version string, os string, arch string) string {
@@ -138,12 +162,24 @@ func (m *Manager) getConfigPath() string {
 	return filepath.Join(cliManagerDir, "installed.json")
 }
 
+// MarkUninstalled marks the current binaries installed with their paths
+func (m *Manager) MarkUninstalled(appName string) error {
+	installedAppsJSON := m.getConfigPath()
+	config := loadConfig(installedAppsJSON)
+	for bin, app := range config {
+		if app.App == appName {
+			delete(config, bin)
+		}
+	}
+	return saveConfig(installedAppsJSON, config)
+}
+
 // MarkInstalled marks the current binaries installed with their paths
-func (m *Manager) MarkInstalled(bins map[string]string, binpath string) error {
+func (m *Manager) MarkInstalled(app string, bins map[string]string, binpath string, installName string) error {
 	installedAppsJSON := m.getConfigPath()
 	config := loadConfig(installedAppsJSON)
 	for k := range bins {
-		config[k] = &CLIApp{Path: binpath, Bin: k}
+		config[k] = &CLIApp{Path: binpath, Bin: k, App: app, InstallName: installName}
 	}
 	return saveConfig(installedAppsJSON, config)
 }
