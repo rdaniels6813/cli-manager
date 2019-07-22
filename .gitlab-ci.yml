@@ -1,0 +1,11 @@
+image: golang:1.12
+
+build:
+  stage: build
+  script: 
+    - go build
+
+test:
+  stage: test
+  script: 
+    - go test -cover -v
