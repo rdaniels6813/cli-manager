@@ -1,8 +1,8 @@
-image: golang:1.12.7
+image: golang:rc
 
 build:
   stage: build
-  script: 
+  script:
     - go build
 
 test:
