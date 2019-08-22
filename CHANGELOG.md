@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/rdaniels6813/cli-manager/compare/v1.0.1...v1.0.2) (2019-08-22)
+
+
+### Bug Fixes
+
+* revert ([07d3d4c](https://github.com/rdaniels6813/cli-manager/commit/07d3d4c))
+
 ## [1.0.1](https://github.com/rdaniels6813/cli-manager/compare/v1.0.0...v1.0.1) (2019-08-22)
 
 
