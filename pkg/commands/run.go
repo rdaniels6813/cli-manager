@@ -6,7 +6,7 @@ import (
 	"os/exec"
 
 	"github.com/spf13/afero"
-	"lab.bittrd.com/bittrd/cli-manager/pkg/nodeman"
+	"github.com/rdaniels6813/cli-manager/pkg/nodeman"
 
 	"github.com/spf13/cobra"
 )
