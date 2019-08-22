@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/rdaniels6813/cli-manager/compare/v1.0.0...v1.0.1) (2019-08-22)
+
+
+### Bug Fixes
+
+* update tests in make file ([d604c10](https://github.com/rdaniels6813/cli-manager/commit/d604c10))
+
 # 1.0.0 (2019-08-19)
 
 
