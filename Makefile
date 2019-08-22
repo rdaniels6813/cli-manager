@@ -6,7 +6,7 @@ build:
 	GOOS=linux GOARCH=amd64 go build -o bin/$(binary_name)-linux-amd64 cmd/cli/main.go
 
 test:
-	go test -cover -v
+	go test -cover -v ./...
 
 release:
 	semantic-release
