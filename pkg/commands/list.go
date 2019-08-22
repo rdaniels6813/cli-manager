@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/spf13/afero"
-	"lab.bittrd.com/bittrd/cli-manager/nodeman"
+	"lab.bittrd.com/bittrd/cli-manager/pkg/nodeman"
 
 	"github.com/spf13/cobra"
 )

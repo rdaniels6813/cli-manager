@@ -7,8 +7,11 @@ require (
 	github.com/andybalholm/brotli v0.0.0-20190704151324-71eb68cc467c // indirect
 	github.com/klauspost/compress v1.7.2 // indirect
 	github.com/klauspost/cpuid v1.2.1 // indirect
+	github.com/manifoldco/promptui v0.3.2
 	github.com/mholt/archiver v0.0.0-20190623220050-33320f6f7306
 	github.com/spf13/afero v1.2.2
 	github.com/spf13/cobra v0.0.5
+	github.com/stretchr/objx v0.2.0 // indirect
+	github.com/stretchr/testify v1.3.0
 	golang.org/x/text v0.3.2 // indirect
 )

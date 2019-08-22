@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"lab.bittrd.com/bittrd/cli-manager/nodeman"
+	"lab.bittrd.com/bittrd/cli-manager/pkg/nodeman"
 )
 
 // installCmd represents the install command
