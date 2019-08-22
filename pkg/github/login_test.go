@@ -49,12 +49,14 @@ func (f *LoginFixture) Close() {
 	}
 }
 
-func NewLoginFixture(t *testing.T, oauthServer *httptest.Server, otpServer *httptest.Server) (*gomock.Controller, *LoginFixture) {
+func NewLoginFixture(t *testing.T,
+	oAuthServer *httptest.Server,
+	otpServer *httptest.Server) (*gomock.Controller, *LoginFixture) {
 	ctrl := gomock.NewController(t)
 
 	fixture := &LoginFixture{
 		MockPrompter:   promptui.NewMockPrompter(ctrl),
-		OAuthServer:    oauthServer,
+		OAuthServer:    oAuthServer,
 		OAuthOTPServer: otpServer,
 	}
 	api, err := github.CreateAPI(func(o *github.API) {
@@ -75,9 +77,9 @@ func NewLoginFixture(t *testing.T, oauthServer *httptest.Server, otpServer *http
 
 func TestLoginWithUsernamePasswordSucceeds(t *testing.T) {
 	expectedToken := "my-awesome-token"
-	oauthServer := newOauthServer(expectedToken)
+	oAuthServer := newOauthServer(expectedToken)
 	otpServer := newServer()
-	ctrl, fixture := NewLoginFixture(t, oauthServer, otpServer)
+	ctrl, fixture := NewLoginFixture(t, oAuthServer, otpServer)
 	defer ctrl.Finish()
 	defer fixture.Close()
 
@@ -108,4 +110,8 @@ func TestLoginWithUsernamePasswordFails(t *testing.T) {
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "", token)
+}
+
+func TestLoginOTPSuccess(t *testing.T) {
+
 }

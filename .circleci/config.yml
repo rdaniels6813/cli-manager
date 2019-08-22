@@ -7,6 +7,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: go lint
+          command: make lint
+      - run:
           name: go test
           command: make test
       - run:

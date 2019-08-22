@@ -20,14 +20,14 @@ type nodeLTSSchedule struct {
 type ltsType interface{}
 
 func (n *nodeLTSSchedule) isLTS() bool {
-	switch n.LTS.(type) {
+	switch v := n.LTS.(type) {
 	case string:
-		if n.LTS == "false" {
+		if v == "false" {
 			return false
 		}
 		return true
 	case bool:
-		return n.LTS.(bool)
+		return v
 	}
 	return false
 }

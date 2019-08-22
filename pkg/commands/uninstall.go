@@ -3,8 +3,8 @@ package cmd
 import (
 	"log"
 
-	"github.com/spf13/afero"
 	"github.com/rdaniels6813/cli-manager/pkg/nodeman"
+	"github.com/spf13/afero"
 
 	"github.com/spf13/cobra"
 )
@@ -27,7 +27,10 @@ var uninstallCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		manager.MarkUninstalled(app.App)
+		err = manager.MarkUninstalled(app.App)
+		if err != nil {
+			log.Println(err)
+		}
 	},
 }
 

@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"fmt"
+
+	"github.com/rdaniels6813/cli-manager/pkg/nodeman"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"github.com/rdaniels6813/cli-manager/pkg/nodeman"
 )
 
 // installCmd represents the install command
@@ -20,8 +22,14 @@ var installCmd = &cobra.Command{
 		engine := output.Engines["node"]
 		version := nodeman.GetNodeVersionByRangeOrLTS(engine)
 		installNode := nodeManager.GetNode(version)
-		installNode.Npm("install", "-g", args[0])
-		nodeManager.MarkInstalled(output.Name, output.Bin, installNode.BinPath(), args[0])
+		err := installNode.Npm("install", "-g", args[0])
+		if err != nil {
+			fmt.Println(err)
+		}
+		err = nodeManager.MarkInstalled(output.Name, output.Bin, installNode.BinPath(), args[0])
+		if err != nil {
+			fmt.Println(err)
+		}
 	},
 }
 

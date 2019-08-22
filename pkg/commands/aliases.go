@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/afero"
 	"github.com/rdaniels6813/cli-manager/pkg/nodeman"
+	"github.com/spf13/afero"
 
 	"github.com/spf13/cobra"
 )
@@ -42,13 +42,15 @@ const bashAliasesSnippet = "source <(cli-manager aliases -g -b)\n"
 const powershellAliasesSnippet = "Invoke-Expression $($(cli-manager.exe aliases -g -p) -join \"`n\")\n"
 
 func handleZshAliases(generate bool, install bool) {
-	if generate {
+	switch {
+	case generate:
 		manager := nodeman.NewManager(afero.NewOsFs())
 		apps := manager.GetInstalledExecutables()
 		for _, app := range apps {
 			fmt.Printf("alias %s='cli-manager run %s'\n", app, app)
 		}
-	} else if install {
+		break
+	case install:
 		dir, err := os.UserHomeDir()
 		if err != nil {
 			log.Fatal(err)
@@ -63,19 +65,22 @@ func handleZshAliases(generate bool, install bool) {
 		} else {
 			fmt.Printf("Aliases already installed in: %s\n", scriptPath)
 		}
-	} else {
+		break
+	default:
 		fmt.Printf("Add the following line to your .zshrc file:\n\n%s", zshAliasesSnippet)
 	}
 }
 
 func handleBashAliases(generate bool, install bool) {
-	if generate {
+	switch {
+	case generate:
 		manager := nodeman.NewManager(afero.NewOsFs())
 		apps := manager.GetInstalledExecutables()
 		for _, app := range apps {
 			fmt.Printf("alias %s='cli-manager run %s'\n", app, app)
 		}
-	} else if install {
+		break
+	case install:
 		dir, err := os.UserHomeDir()
 		if err != nil {
 			log.Fatal(err)
@@ -90,19 +95,22 @@ func handleBashAliases(generate bool, install bool) {
 		} else {
 			fmt.Printf("Aliases already installed in: %s\n", scriptPath)
 		}
-	} else {
+		break
+	default:
 		fmt.Printf("Add the following line to your .bashrc or .profile file:\n\n%s", bashAliasesSnippet)
 	}
 }
 
 func handlePowershellAliases(generate bool, install bool, core bool) {
-	if generate {
+	switch {
+	case generate:
 		manager := nodeman.NewManager(afero.NewOsFs())
 		apps := manager.GetInstalledExecutables()
 		for _, app := range apps {
 			fmt.Printf("function %s { cli-manager.exe run %s @args }", app, app)
 		}
-	} else if install {
+		break
+	case install:
 		scriptPath := getPowershellProfilePath(core)
 		wrote, err := writeShellSnippet(powershellAliasesSnippet, scriptPath)
 		if err != nil {
@@ -113,14 +121,16 @@ func handlePowershellAliases(generate bool, install bool, core bool) {
 		} else {
 			fmt.Printf("Aliases already installed in: %s\n", scriptPath)
 		}
-	} else {
+		break
+	default:
 		fmt.Printf("Add the following line to your $PROFILE file:\n\n%s", powershellAliasesSnippet)
 	}
 }
 
 func init() {
 	rootCmd.AddCommand(aliasesCmd)
-	aliasesCmd.Flags().BoolP("generate", "g", false, "Generate completion for shell specified by $SHELL and send to stdout")
+	aliasesCmd.Flags().BoolP("generate", "g", false,
+		"Generate completion for shell specified by $SHELL and send to stdout")
 	aliasesCmd.Flags().BoolP("powershell", "p", false, "Generate powershell aliases")
 	aliasesCmd.Flags().BoolP("pwsh", "c", false, "Generate powershell core aliases")
 	aliasesCmd.Flags().BoolP("bash", "b", false, "Generate bash aliases")

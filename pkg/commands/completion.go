@@ -44,13 +44,18 @@ const bashCompletionSnippet = "source <(cli-manager completion -g -b)\n"
 const powershellCompletionSnippet = "Invoke-Expression $($(cli-manager.exe completion -g -p) -join \"`n\")\n"
 
 func handleZshCompletion(generate bool, install bool) {
-	if generate {
+	switch {
+	case generate:
 		var data []byte
 		buf := bytes.NewBuffer(data)
-		rootCmd.GenZshCompletion(buf)
+		err := rootCmd.GenZshCompletion(buf)
+		if err != nil {
+			fmt.Println(err)
+		}
 		output, _ := ioutil.ReadAll(buf)
 		fmt.Print(strings.TrimPrefix(string(output), "#"))
-	} else if install {
+		break
+	case install:
 		dir, err := os.UserHomeDir()
 		if err != nil {
 			log.Fatal(err)
@@ -65,15 +70,21 @@ func handleZshCompletion(generate bool, install bool) {
 		} else {
 			fmt.Printf("Completion already installed in: %s\n", scriptPath)
 		}
-	} else {
+		break
+	default:
 		fmt.Printf("Add the following line to your .zshrc file:\n\n%s", zshCompletionSnippet)
 	}
 }
 
 func handleBashCompletion(generate bool, install bool) {
-	if generate {
-		rootCmd.GenBashCompletion(os.Stdout)
-	} else if install {
+	switch {
+	case generate:
+		err := rootCmd.GenBashCompletion(os.Stdout)
+		if err != nil {
+			fmt.Println(err)
+		}
+		break
+	case install:
 		dir, err := os.UserHomeDir()
 		if err != nil {
 			log.Fatal(err)
@@ -88,15 +99,21 @@ func handleBashCompletion(generate bool, install bool) {
 		} else {
 			fmt.Printf("Completion already installed in: %s\n", scriptPath)
 		}
-	} else {
+		break
+	default:
 		fmt.Printf("Add the following line to your .bashrc or .profile file:\n\n%s", bashCompletionSnippet)
 	}
 }
 
 func handlePowershellCompletion(generate bool, install bool, core bool) {
-	if generate {
-		rootCmd.GenPowerShellCompletion(os.Stdout)
-	} else if install {
+	switch {
+	case generate:
+		err := rootCmd.GenPowerShellCompletion(os.Stdout)
+		if err != nil {
+			fmt.Println(err)
+		}
+		break
+	case install:
 		scriptPath := getPowershellProfilePath(core)
 		wrote, err := writeShellSnippet(powershellCompletionSnippet, scriptPath)
 		if err != nil {
@@ -107,7 +124,8 @@ func handlePowershellCompletion(generate bool, install bool, core bool) {
 		} else {
 			fmt.Printf("Completion already installed in: %s\n", scriptPath)
 		}
-	} else {
+		break
+	default:
 		fmt.Printf("Add the following line to your $PROFILE file:\n\n%s", powershellCompletionSnippet)
 	}
 }
@@ -152,7 +170,8 @@ func getShellType(cmd *cobra.Command) shellType {
 	}
 	psModule := os.Getenv("PSModulePath")
 	if psModule != "" {
-		if strings.Contains(strings.ToLower(psModule), fmt.Sprintf("%spowershell%s", string(os.PathSeparator), string(os.PathSeparator))) {
+		powershellPartial := fmt.Sprintf("%spowershell%s", string(os.PathSeparator), string(os.PathSeparator))
+		if strings.Contains(strings.ToLower(psModule), powershellPartial) {
 			return PowershellCore
 		}
 		return Powershell
@@ -220,6 +239,7 @@ func init() {
 	completionCmd.Flags().BoolP("pwsh", "c", false, "Generate powershell core completion")
 	completionCmd.Flags().BoolP("bash", "b", false, "Generate bash completion")
 	completionCmd.Flags().BoolP("zsh", "z", false, "Generate zsh completion")
-	completionCmd.Flags().BoolP("generate", "g", false, "Generate completion for shell specified by $SHELL and send to stdout")
+	completionCmd.Flags().BoolP("generate", "g", false,
+		"Generate completion for shell specified by $SHELL and send to stdout")
 	completionCmd.Flags().BoolP("install", "i", false, "Install the completion script into the users profile")
 }

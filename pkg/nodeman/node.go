@@ -13,6 +13,8 @@ import (
 	"strings"
 )
 
+const WINDOWS = "windows"
+
 // Node helper for wrapping node commands for a node installation
 type Node interface {
 	Node(args ...string) error
@@ -83,14 +85,18 @@ func (n *nodeImpl) githubPackageJSON(packageString string) (*NpmViewResponse, er
 		return &result, err
 	}
 	if resp.StatusCode != 200 {
-		log.Fatalf("Failed to get package.json for project using: %s, please ensure you have set up your github token", packageJSONURL)
+		log.Fatalf("Failed to get package.json for project using: %s, please ensure you have set up your github token",
+			packageJSONURL)
 	}
 	defer resp.Body.Close()
 	var content githubContent
-	json.NewDecoder(resp.Body).Decode(&content)
+	err = json.NewDecoder(resp.Body).Decode(&content)
+	if err != nil {
+		return nil, err
+	}
 	decoded, err := base64.StdEncoding.DecodeString(content.Content)
 	if err != nil {
-		return &result, nil
+		return nil, err
 	}
 	err = json.Unmarshal(decoded, &result)
 	if err != nil {
@@ -110,7 +116,7 @@ func (n *nodeImpl) BinPath() string {
 
 func (n *nodeImpl) command(path string, args ...string) error {
 	cmd := exec.Command(path)
-	var env []string
+	env := make([]string, 0, len(os.Environ()))
 	for _, val := range os.Environ() {
 		name := strings.Split(val, "=")[0]
 		if strings.ToLower(name) == "path" {
@@ -127,21 +133,21 @@ func (n *nodeImpl) command(path string, args ...string) error {
 }
 
 func (n *nodeImpl) getBinPath() string {
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == WINDOWS {
 		return n.nodePath
 	}
 	return filepath.Join(n.nodePath, "bin/")
 }
 
 func (n *nodeImpl) getNodePath() string {
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == WINDOWS {
 		return filepath.Join(n.nodePath, "node.exe")
 	}
 	return filepath.Join(n.nodePath, "bin/node")
 }
 
 func (n *nodeImpl) getNpmPath() string {
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == WINDOWS {
 		return filepath.Join(n.nodePath, "npm.cmd")
 	}
 	return filepath.Join(n.nodePath, "bin/npm")

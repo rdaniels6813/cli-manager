@@ -18,11 +18,12 @@ import (
 	"github.com/mholt/archiver"
 )
 
+const windows = "windows"
+
 // Manager struct for managing node binaries leveraged by the cli manager
 // Use NewManager to create an instance of this object
 type Manager struct {
-	os   afero.Fs
-	http *http.Client
+	os afero.Fs
 }
 
 // NewManager constructor for default manager with the specified node version
@@ -42,7 +43,7 @@ type CLIApp struct {
 func (m *Manager) GetInstalledExecutables() []string {
 	configPath := m.getConfigPath()
 	apps := loadConfig(configPath)
-	var result []string
+	result := make([]string, 0, len(apps))
 	for app := range apps {
 		result = append(result, app)
 	}
@@ -81,9 +82,11 @@ func (m *Manager) GetCLIApp(appName string) (*CLIApp, error) {
 	return nil, fmt.Errorf("App is not installed: %s", appName)
 }
 
-func (m *Manager) getNodeURL(version string, os string, arch string) string {
+func (m *Manager) getNodeURL(version string) string {
 	extension := ".tar.xz"
-	if os == "windows" {
+	os := runtime.GOOS
+	arch := runtime.GOARCH
+	if os == windows {
 		os = "win"
 		extension = ".zip"
 	}
@@ -103,7 +106,10 @@ func (m *Manager) getCliManagerFolder() string {
 	}
 	cliManagerDir := filepath.Join(homeDir, ".cli-manager")
 	if _, err := m.os.Stat(cliManagerDir); os.IsNotExist(err) {
-		m.os.MkdirAll(cliManagerDir, 0700)
+		err = m.os.MkdirAll(cliManagerDir, 0700)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 	return cliManagerDir
 }
@@ -116,7 +122,7 @@ func (m *Manager) GetCommandPath(bin string) (string, error) {
 
 	for k, v := range config {
 		if k == bin {
-			if runtime.GOOS == "windows" {
+			if runtime.GOOS == windows {
 				return filepath.Join(v.Path, fmt.Sprintf("%s.cmd", k)), nil
 			}
 			return filepath.Join(v.Path, fmt.Sprintf("%s", k)), nil
@@ -132,7 +138,7 @@ func (m *Manager) ConfigureNodeOnCommand(command string, cmd *exec.Cmd) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var env []string
+	env := make([]string, 0, len(os.Environ()))
 	for _, val := range os.Environ() {
 		name := strings.Split(val, "=")[0]
 		if strings.ToLower(name) == "path" {
@@ -215,16 +221,18 @@ func (m *Manager) getNodeBaseFolder() string {
 	cliManagerDir := m.getCliManagerFolder()
 	nodeFolder := filepath.Join(cliManagerDir, "node")
 	if _, err := m.os.Stat(nodeFolder); os.IsNotExist(err) {
-		m.os.MkdirAll(nodeFolder, 0700)
+		err = m.os.MkdirAll(nodeFolder, 0700)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 	return nodeFolder
 }
 
 func (m *Manager) downloadNodeArchive(version string) string {
 	nodeBaseFolder := m.getNodeBaseFolder()
-	url := m.getNodeURL(version, runtime.GOOS, runtime.GOARCH)
 	// Create the file
-	nodeBinaryPath := filepath.Join(nodeBaseFolder, filepath.Base(url))
+	nodeBinaryPath := filepath.Join(nodeBaseFolder, filepath.Base(m.getNodeURL(version)))
 	if _, err := m.os.Stat(nodeBinaryPath); os.IsNotExist(err) {
 		out, err := os.Create(nodeBinaryPath)
 		if err != nil {
@@ -233,7 +241,7 @@ func (m *Manager) downloadNodeArchive(version string) string {
 		defer out.Close()
 
 		// Get the data
-		resp, err := http.Get(url)
+		resp, err := http.Get(m.getNodeURL(version))
 		if err != nil {
 			log.Fatalf("Failed download node binary: %v", err)
 		}
@@ -254,7 +262,10 @@ func (m *Manager) getNodeOutputFolder(version string) string {
 
 func (m *Manager) unpackNodeArchive(path string, version string) {
 	outputFolder := m.getNodeOutputFolder(version)
-	archiver.Unarchive(path, outputFolder)
+	err := archiver.Unarchive(path, outputFolder)
+	if err != nil {
+		log.Fatalf("Failed to unarchive: %s", err)
+	}
 	dirs, err := ioutil.ReadDir(outputFolder)
 	if err != nil {
 		log.Fatalf("Failed to read dir: %v", err)
@@ -271,5 +282,8 @@ func (m *Manager) unpackNodeArchive(path string, version string) {
 	}
 	os.Remove(outputFolder)
 	err = os.Rename(tmpPath, outputFolder)
+	if err != nil {
+		log.Fatalf("Failed to rename archive paths: %s", err)
+	}
 	os.Remove(path)
 }

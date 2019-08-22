@@ -65,6 +65,9 @@ func (g *API) tryLogin(username string, password string) (string, error) {
 	defer res.Body.Close()
 	var token tokenResponse
 	err = json.NewDecoder(res.Body).Decode(&token)
+	if err != nil {
+		return "", err
+	}
 	return token.Token, nil
 }
 
@@ -75,6 +78,9 @@ func (g *API) loginWithOTP(username string, password string, otpHeader string) (
 	}
 	req.SetBasicAuth(username, password)
 	otp, err := g.getOTP(otpHeader)
+	if err != nil {
+		return "", err
+	}
 	req.Header.Set("x-github-otp", otp)
 	client := &http.Client{}
 	res, err := client.Do(req)
