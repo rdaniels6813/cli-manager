@@ -7,7 +7,7 @@ build:
 	GOOS=linux GOARCH=amd64 go build -o bin/$(binary_name)-linux-amd64 cmd/cli/main.go
 
 test:
-	go test -cover -v ./...
+	go test -coverprofile=coverage.txt -covermode=atomic ./...
 
 lint:
 	# Install golangci-lint if it's not already installed

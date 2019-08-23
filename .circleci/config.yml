@@ -15,6 +15,9 @@ jobs:
       - run:
           name: go build
           command: make build
+      - run:
+          name: codecov
+          command: bash <(curl -s https://codecov.io/bash)
       - persist_to_workspace:
           root: /root/project/
           paths:
