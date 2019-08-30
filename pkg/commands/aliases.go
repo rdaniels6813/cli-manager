@@ -3,11 +3,9 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 
-	"github.com/rdaniels6813/cli-manager/pkg/nodeman"
-	"github.com/spf13/afero"
+	"github.com/rdaniels6813/cli-manager/pkg/aliases"
+	"github.com/rdaniels6813/cli-manager/pkg/shell"
 
 	"github.com/spf13/cobra"
 )
@@ -20,110 +18,66 @@ var aliasesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		gen, _ := cmd.Flags().GetBool("generate")
 		install, _ := cmd.Flags().GetBool("install")
-		shellType := getShellType(cmd)
+		zsh, _ := cmd.Flags().GetBool("zsh")
+		powershell, _ := cmd.Flags().GetBool("powershell")
+		bash, _ := cmd.Flags().GetBool("bash")
+		powershellCore, _ := cmd.Flags().GetBool("pwsh")
+		shellType := shell.GetShellType(zsh, powershell, bash, powershellCore)
 
 		switch shellType {
-		case Zsh:
+		case shell.Zsh:
 			handleZshAliases(gen, install)
-		case Bash:
+		case shell.Bash:
 			handleBashAliases(gen, install)
-		case Powershell:
+		case shell.Powershell:
 			handlePowershellAliases(gen, install, false)
-		case PowershellCore:
+		case shell.PowershellCore:
 			handlePowershellAliases(gen, install, true)
-		case Unknown:
+		case shell.Unknown:
 			log.Fatal("Unknown shell, please specify your shell using flags")
 		}
 	},
 }
 
-const zshAliasesSnippet = "source <(cli-manager aliases -g -z)\n"
-const bashAliasesSnippet = "source <(cli-manager aliases -g -b)\n"
-const powershellAliasesSnippet = "Invoke-Expression $($(cli-manager.exe aliases -g -p) -join \"`n\")\n"
-
-func handleZshAliases(generate bool, install bool) {
+func handleZshAliases(generate bool, install bool) error {
+	generator := aliases.NewZshGenerator()
 	switch {
 	case generate:
-		manager := nodeman.NewManager(afero.NewOsFs())
-		apps := manager.GetInstalledExecutables()
-		for _, app := range apps {
-			fmt.Printf("alias %s='cli-manager run %s'\n", app, app)
-		}
-		break
+		fmt.Println(generator.Generate())
+		return nil
 	case install:
-		dir, err := os.UserHomeDir()
-		if err != nil {
-			log.Fatal(err)
-		}
-		scriptPath := filepath.Join(dir, ".zshrc")
-		wrote, err := writeShellSnippet(zshAliasesSnippet, scriptPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if wrote {
-			fmt.Printf("Wrote aliases script to: %s\n", scriptPath)
-		} else {
-			fmt.Printf("Aliases already installed in: %s\n", scriptPath)
-		}
-		break
+		return generator.Install()
 	default:
-		fmt.Printf("Add the following line to your .zshrc file:\n\n%s", zshAliasesSnippet)
+		fmt.Printf("Add the following line to your .zshrc file:\n\n%s", aliases.ZshAliasesSnippet)
+		return nil
 	}
 }
 
-func handleBashAliases(generate bool, install bool) {
+func handleBashAliases(generate bool, install bool) error {
+	generator := aliases.NewBashGenerator()
 	switch {
 	case generate:
-		manager := nodeman.NewManager(afero.NewOsFs())
-		apps := manager.GetInstalledExecutables()
-		for _, app := range apps {
-			fmt.Printf("alias %s='cli-manager run %s'\n", app, app)
-		}
-		break
+		fmt.Println(generator.Generate())
+		return nil
 	case install:
-		dir, err := os.UserHomeDir()
-		if err != nil {
-			log.Fatal(err)
-		}
-		scriptPath := filepath.Join(dir, ".bashrc")
-		wrote, err := writeShellSnippet(bashAliasesSnippet, scriptPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if wrote {
-			fmt.Printf("Wrote aliases script to: %s\n", scriptPath)
-		} else {
-			fmt.Printf("Aliases already installed in: %s\n", scriptPath)
-		}
-		break
+		return generator.Install()
 	default:
-		fmt.Printf("Add the following line to your .bashrc or .profile file:\n\n%s", bashAliasesSnippet)
+		fmt.Printf("Add the following line to your .bashrc or .profile file:\n\n%s", aliases.BashAliasesSnippet)
+		return nil
 	}
 }
 
-func handlePowershellAliases(generate bool, install bool, core bool) {
+func handlePowershellAliases(generate bool, install bool, core bool) error {
+	generator := aliases.NewPowershellGenerator(core)
 	switch {
 	case generate:
-		manager := nodeman.NewManager(afero.NewOsFs())
-		apps := manager.GetInstalledExecutables()
-		for _, app := range apps {
-			fmt.Printf("function %s { cli-manager.exe run %s @args }", app, app)
-		}
-		break
+		fmt.Println(generator.Generate())
+		return nil
 	case install:
-		scriptPath := getPowershellProfilePath(core)
-		wrote, err := writeShellSnippet(powershellAliasesSnippet, scriptPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if wrote {
-			fmt.Printf("Wrote aliases script to: %s\n", scriptPath)
-		} else {
-			fmt.Printf("Aliases already installed in: %s\n", scriptPath)
-		}
-		break
+		return generator.Install()
 	default:
-		fmt.Printf("Add the following line to your $PROFILE file:\n\n%s", powershellAliasesSnippet)
+		fmt.Printf("Add the following line to your $PROFILE file:\n\n%s", aliases.PowershellAliasesSnippet)
+		return nil
 	}
 }
 

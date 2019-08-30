@@ -8,9 +8,9 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 
+	"github.com/rdaniels6813/cli-manager/pkg/shell"
 	"github.com/spf13/cobra"
 )
 
@@ -22,18 +22,22 @@ var completionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		gen, _ := cmd.Flags().GetBool("generate")
 		install, _ := cmd.Flags().GetBool("install")
-		shellType := getShellType(cmd)
+		zsh, _ := cmd.Flags().GetBool("zsh")
+		powershell, _ := cmd.Flags().GetBool("powershell")
+		bash, _ := cmd.Flags().GetBool("bash")
+		powershellCore, _ := cmd.Flags().GetBool("pwsh")
+		shellType := shell.GetShellType(zsh, powershell, bash, powershellCore)
 
 		switch shellType {
-		case Zsh:
+		case shell.Zsh:
 			handleZshCompletion(gen, install)
-		case Bash:
+		case shell.Bash:
 			handleBashCompletion(gen, install)
-		case Powershell:
+		case shell.Powershell:
 			handlePowershellCompletion(gen, install, false)
-		case PowershellCore:
+		case shell.PowershellCore:
 			handlePowershellCompletion(gen, install, true)
-		case Unknown:
+		case shell.Unknown:
 			log.Fatal("Unknown shell, please specify your shell using flags")
 		}
 	},
@@ -114,7 +118,7 @@ func handlePowershellCompletion(generate bool, install bool, core bool) {
 		}
 		break
 	case install:
-		scriptPath := getPowershellProfilePath(core)
+		scriptPath := shell.GetPowershellProfilePath(core)
 		wrote, err := writeShellSnippet(powershellCompletionSnippet, scriptPath)
 		if err != nil {
 			log.Fatal(err)
@@ -128,79 +132,6 @@ func handlePowershellCompletion(generate bool, install bool, core bool) {
 	default:
 		fmt.Printf("Add the following line to your $PROFILE file:\n\n%s", powershellCompletionSnippet)
 	}
-}
-
-type shellType string
-
-const (
-	// Zsh enum for zsh shell
-	Zsh shellType = "zsh"
-	// Bash enum for the bash shell
-	Bash shellType = "bash"
-	// Powershell enum for powershell
-	Powershell shellType = "powershell"
-	// PowershellCore enum for powershell
-	PowershellCore shellType = "pwsh"
-	// Unknown enum for unknown or unsupported shell
-	Unknown shellType = "unknown"
-)
-
-func getShellType(cmd *cobra.Command) shellType {
-	zsh, _ := cmd.Flags().GetBool("zsh")
-	powershell, _ := cmd.Flags().GetBool("powershell")
-	bash, _ := cmd.Flags().GetBool("bash")
-	powershellCore, _ := cmd.Flags().GetBool("pwsh")
-	if zsh {
-		return Zsh
-	}
-	if bash {
-		return Bash
-	}
-	if powershell {
-		return Powershell
-	}
-	if powershellCore {
-		return PowershellCore
-	}
-	if os.Getenv("ZSH_NAME") != "" || os.Getenv("ZSH") != "" {
-		return Zsh
-	}
-	if os.Getenv("BASH") != "" {
-		return Bash
-	}
-	psModule := os.Getenv("PSModulePath")
-	if psModule != "" {
-		powershellPartial := fmt.Sprintf("%spowershell%s", string(os.PathSeparator), string(os.PathSeparator))
-		if strings.Contains(strings.ToLower(psModule), powershellPartial) {
-			return PowershellCore
-		}
-		return Powershell
-	}
-	return Unknown
-}
-
-func getPowershellProfilePath(core bool) string {
-	dir, _ := os.UserHomeDir()
-	myDocuments := ""
-	if _, err := os.Stat(myDocuments); os.IsNotExist(err) {
-		myDocuments = filepath.Join(dir, "My Documents")
-		if _, err = os.Stat(myDocuments); os.IsNotExist(err) {
-			myDocuments = filepath.Join(dir, "Documents")
-		}
-	}
-	if core {
-		switch runtime.GOOS {
-		case "windows":
-			return filepath.Join(myDocuments, "PowerShell", "Microsoft.PowerShell_profile.ps1")
-		case "linux":
-			return filepath.Join(dir, ".config", "powershell", "Microsoft.PowerShell_profile.ps1")
-		case "darwin":
-			fmt.Print("This is untested on macos with powershell core")
-			return filepath.Join(dir, ".config", "powershell", "Microsoft.PowerShell_profile.ps1")
-		}
-
-	}
-	return filepath.Join(myDocuments, "PowerShell", "Microsoft.PowerShell_profile.ps1")
 }
 
 func writeShellSnippet(snippet string, path string) (bool, error) {
