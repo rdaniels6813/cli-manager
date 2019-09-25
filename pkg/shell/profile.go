@@ -1,21 +1,26 @@
 package shell
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/spf13/afero"
 )
 
-func WriteProfileSnippet(snippet, path string) (bool, error) {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		err := os.MkdirAll(filepath.Dir(path), 777)
+type ProfileHelper struct {
+	FS afero.Fs
+}
+
+func (p *ProfileHelper) WriteProfileSnippet(snippet, path string) (bool, error) {
+	if _, err := p.FS.Stat(path); os.IsNotExist(err) {
+		err := p.FS.MkdirAll(filepath.Dir(path), 777)
 		if err != nil {
 			return false, err
 		}
-		f, err := os.Create(path)
+		f, err := p.FS.Create(path)
 		defer f.Close()
 		if err != nil {
 			return false, err
@@ -23,28 +28,29 @@ func WriteProfileSnippet(snippet, path string) (bool, error) {
 		_, err = f.WriteString(snippet)
 		return true, err
 	}
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
-	defer f.Close()
+	profileBytes, err := afero.ReadFile(p.FS, path)
 	if err != nil {
 		return false, err
 	}
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		text := scanner.Text()
-		if strings.Contains(text, snippet) {
-			return false, nil
-		}
+	text := string(profileBytes)
+	if strings.Contains(text, snippet) {
+		return false, nil
+	}
+	f, err := p.FS.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	defer f.Close()
+	if err != nil {
+		return false, err
 	}
 	_, err = f.WriteString(fmt.Sprintf("%s\n", snippet))
 	return true, err
 }
 
-func GetPowershellProfilePath(core bool) string {
+func (p *ProfileHelper) GetPowershellProfilePath(core bool) string {
 	dir, _ := os.UserHomeDir()
 	myDocuments := ""
-	if _, err := os.Stat(myDocuments); os.IsNotExist(err) {
+	if _, err := p.FS.Stat(myDocuments); os.IsNotExist(err) {
 		myDocuments = filepath.Join(dir, "My Documents")
-		if _, err = os.Stat(myDocuments); os.IsNotExist(err) {
+		if _, err = p.FS.Stat(myDocuments); os.IsNotExist(err) {
 			myDocuments = filepath.Join(dir, "Documents")
 		}
 	}
