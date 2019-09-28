@@ -24,17 +24,21 @@ var aliasesCmd = &cobra.Command{
 		powershellCore, _ := cmd.Flags().GetBool("pwsh")
 		shellType := shell.GetShellType(zsh, powershell, bash, powershellCore)
 
+		var err error
 		switch shellType {
 		case shell.Zsh:
-			handleZshAliases(gen, install)
+			err = handleZshAliases(gen, install)
 		case shell.Bash:
-			handleBashAliases(gen, install)
+			err = handleBashAliases(gen, install)
 		case shell.Powershell:
-			handlePowershellAliases(gen, install, false)
+			err = handlePowershellAliases(gen, install, false)
 		case shell.PowershellCore:
-			handlePowershellAliases(gen, install, true)
+			err = handlePowershellAliases(gen, install, true)
 		case shell.Unknown:
 			log.Fatal("Unknown shell, please specify your shell using flags")
+		}
+		if err != nil {
+			log.Fatalf("Error occurred handling aliases: %s", err)
 		}
 	},
 }
