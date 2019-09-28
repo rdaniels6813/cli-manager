@@ -33,7 +33,8 @@ func newProfileFixture(t *testing.T, fs afero.Fs) *profileFixture {
 }
 
 func TestWriteProfileSnippetNewFile(t *testing.T) {
-	fixture := newProfileFixture(t, nil)
+	fs := afero.NewMemMapFs()
+	fixture := newProfileFixture(t, fs)
 	result, err := fixture.helper.WriteProfileSnippet(fixture.snippet, fixture.filePath)
 
 	assert.Nil(t, err)
@@ -46,7 +47,8 @@ func TestWriteProfileSnippetNewFile(t *testing.T) {
 }
 
 func TestWriteProfileSnippetExistingFile(t *testing.T) {
-	fixture := newProfileFixture(t, nil)
+	fs := afero.NewMemMapFs()
+	fixture := newProfileFixture(t, fs)
 	existingProfile := "# this is my profile\necho Welcome!\n"
 
 	err := afero.WriteFile(fixture.fs, fixture.filePath, []byte(existingProfile), 0666)
@@ -65,7 +67,8 @@ func TestWriteProfileSnippetExistingFile(t *testing.T) {
 }
 
 func TestWriteProfileSnippetExistingFileAlreadyHasSnippet(t *testing.T) {
-	fixture := newProfileFixture(t, nil)
+	fs := afero.NewMemMapFs()
+	fixture := newProfileFixture(t, fs)
 	existingProfile := fmt.Sprintf("# this is my profile\necho Welcome!\n%s\n", fixture.snippet)
 
 	err := afero.WriteFile(fixture.fs, fixture.filePath, []byte(existingProfile), 0666)
