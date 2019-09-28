@@ -35,7 +35,8 @@ func (g *ZshGenerator) Install() error {
 		return err
 	}
 	scriptPath := filepath.Join(dir, ".zshrc")
-	wrote, err := shell.WriteProfileSnippet(ZshAliasesSnippet, scriptPath)
+	profileHelper := shell.ProfileHelper{}
+	wrote, err := profileHelper.WriteProfileSnippet(ZshAliasesSnippet, scriptPath)
 	if err != nil {
 		log.Fatal(err)
 	}

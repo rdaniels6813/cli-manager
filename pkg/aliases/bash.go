@@ -33,7 +33,8 @@ func (g *BashGenerator) Install() error {
 		return err
 	}
 	scriptPath := filepath.Join(dir, ".bashrc")
-	wrote, err := shell.WriteProfileSnippet(BashAliasesSnippet, scriptPath)
+	profileHelper := shell.ProfileHelper{}
+	wrote, err := profileHelper.WriteProfileSnippet(BashAliasesSnippet, scriptPath)
 	if err != nil {
 		return err
 	}

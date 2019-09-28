@@ -20,7 +20,7 @@ type profileFixture struct {
 	filePath string
 }
 
-func newProfileFixture(t *testing.T, fs afero.Fs) *profileFixture {
+func newProfileFixture(fs afero.Fs) *profileFixture {
 	helper := &shell.ProfileHelper{
 		FS: fs,
 	}
@@ -34,7 +34,7 @@ func newProfileFixture(t *testing.T, fs afero.Fs) *profileFixture {
 
 func TestWriteProfileSnippetNewFile(t *testing.T) {
 	fs := afero.NewMemMapFs()
-	fixture := newProfileFixture(t, fs)
+	fixture := newProfileFixture(fs)
 	result, err := fixture.helper.WriteProfileSnippet(fixture.snippet, fixture.filePath)
 
 	assert.Nil(t, err)
@@ -48,7 +48,7 @@ func TestWriteProfileSnippetNewFile(t *testing.T) {
 
 func TestWriteProfileSnippetExistingFile(t *testing.T) {
 	fs := afero.NewMemMapFs()
-	fixture := newProfileFixture(t, fs)
+	fixture := newProfileFixture(fs)
 	existingProfile := "# this is my profile\necho Welcome!\n"
 
 	err := afero.WriteFile(fixture.fs, fixture.filePath, []byte(existingProfile), 0666)
@@ -68,7 +68,7 @@ func TestWriteProfileSnippetExistingFile(t *testing.T) {
 
 func TestWriteProfileSnippetExistingFileAlreadyHasSnippet(t *testing.T) {
 	fs := afero.NewMemMapFs()
-	fixture := newProfileFixture(t, fs)
+	fixture := newProfileFixture(fs)
 	existingProfile := fmt.Sprintf("# this is my profile\necho Welcome!\n%s\n", fixture.snippet)
 
 	err := afero.WriteFile(fixture.fs, fixture.filePath, []byte(existingProfile), 0666)
@@ -84,7 +84,7 @@ func TestWriteProfileSnippetFailsToMakeDirectory(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	mockFS := mock_afero.NewMockFs(controller)
-	fixture := newProfileFixture(t, mockFS)
+	fixture := newProfileFixture(mockFS)
 
 	mockFS.EXPECT().Stat(fixture.filePath).Times(1).Return(nil, os.ErrNotExist)
 	mockFS.EXPECT().MkdirAll(filepath.Dir(fixture.filePath), os.FileMode(777)).Times(1).Return(os.ErrPermission)

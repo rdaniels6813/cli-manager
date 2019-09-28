@@ -27,8 +27,9 @@ func (g *PowershellGenerator) Generate() string {
 }
 
 func (g *PowershellGenerator) Install() error {
-	scriptPath := shell.GetPowershellProfilePath(g.PowershellCore)
-	wrote, err := shell.WriteProfileSnippet(PowershellAliasesSnippet, scriptPath)
+	profileHelper := shell.ProfileHelper{}
+	scriptPath := profileHelper.GetPowershellProfilePath(g.PowershellCore)
+	wrote, err := profileHelper.WriteProfileSnippet(PowershellAliasesSnippet, scriptPath)
 	if err != nil {
 		log.Fatal(err)
 	}
