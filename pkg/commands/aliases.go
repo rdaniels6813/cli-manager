@@ -86,7 +86,7 @@ func handlePowershellAliases(generate bool, install bool, core bool) error {
 }
 
 func init() {
-	rootCmd.AddCommand(aliasesCmd)
+	RootCmd.AddCommand(aliasesCmd)
 	aliasesCmd.Flags().BoolP("generate", "g", false,
 		"Generate completion for shell specified by $SHELL and send to stdout")
 	aliasesCmd.Flags().BoolP("powershell", "p", false, "Generate powershell aliases")

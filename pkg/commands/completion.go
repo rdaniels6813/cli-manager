@@ -52,7 +52,7 @@ func handleZshCompletion(generate bool, install bool) {
 	case generate:
 		var data []byte
 		buf := bytes.NewBuffer(data)
-		err := rootCmd.GenZshCompletion(buf)
+		err := RootCmd.GenZshCompletion(buf)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -83,7 +83,7 @@ func handleZshCompletion(generate bool, install bool) {
 func handleBashCompletion(generate bool, install bool) {
 	switch {
 	case generate:
-		err := rootCmd.GenBashCompletion(os.Stdout)
+		err := RootCmd.GenBashCompletion(os.Stdout)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -112,7 +112,7 @@ func handleBashCompletion(generate bool, install bool) {
 func handlePowershellCompletion(generate bool, install bool, core bool) {
 	switch {
 	case generate:
-		err := rootCmd.GenPowerShellCompletion(os.Stdout)
+		err := RootCmd.GenPowerShellCompletion(os.Stdout)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -169,7 +169,7 @@ func writeShellSnippet(snippet string, path string) (bool, error) {
 }
 
 func init() {
-	rootCmd.AddCommand(completionCmd)
+	RootCmd.AddCommand(completionCmd)
 	completionCmd.Flags().BoolP("powershell", "p", false, "Generate powershell completion")
 	completionCmd.Flags().BoolP("pwsh", "c", false, "Generate powershell core completion")
 	completionCmd.Flags().BoolP("bash", "b", false, "Generate bash completion")

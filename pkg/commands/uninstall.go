@@ -35,5 +35,5 @@ var uninstallCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(uninstallCmd)
+	RootCmd.AddCommand(uninstallCmd)
 }
