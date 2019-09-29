@@ -29,10 +29,10 @@ func (p *ProfileHelper) WriteProfileSnippet(snippet, path string) (bool, error) 
 			return false, err
 		}
 		f, err := p.FS.Create(path)
-		defer f.Close()
 		if err != nil {
 			return false, err
 		}
+		defer f.Close()
 		_, err = f.WriteString(snippet)
 		return true, err
 	}
@@ -45,10 +45,10 @@ func (p *ProfileHelper) WriteProfileSnippet(snippet, path string) (bool, error) 
 		return false, nil
 	}
 	f, err := p.FS.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-	defer f.Close()
 	if err != nil {
 		return false, err
 	}
+	defer f.Close()
 	_, err = f.WriteString(fmt.Sprintf("%s\n", snippet))
 	return true, err
 }
