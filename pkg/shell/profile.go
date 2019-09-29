@@ -11,7 +11,15 @@ import (
 )
 
 type ProfileHelper struct {
-	FS afero.Fs
+	FS   afero.Fs
+	GOOS string
+}
+
+func NewProfileHelper() *ProfileHelper {
+	return &ProfileHelper{
+		FS:   afero.OsFs{},
+		GOOS: runtime.GOOS,
+	}
 }
 
 func (p *ProfileHelper) WriteProfileSnippet(snippet, path string) (bool, error) {
@@ -43,28 +51,4 @@ func (p *ProfileHelper) WriteProfileSnippet(snippet, path string) (bool, error) 
 	}
 	_, err = f.WriteString(fmt.Sprintf("%s\n", snippet))
 	return true, err
-}
-
-func (p *ProfileHelper) GetPowershellProfilePath(core bool) string {
-	dir, _ := os.UserHomeDir()
-	myDocuments := ""
-	if _, err := p.FS.Stat(myDocuments); os.IsNotExist(err) {
-		myDocuments = filepath.Join(dir, "My Documents")
-		if _, err = p.FS.Stat(myDocuments); os.IsNotExist(err) {
-			myDocuments = filepath.Join(dir, "Documents")
-		}
-	}
-	if core {
-		switch runtime.GOOS {
-		case "windows":
-			return filepath.Join(myDocuments, "PowerShell", "Microsoft.PowerShell_profile.ps1")
-		case "linux":
-			return filepath.Join(dir, ".config", "powershell", "Microsoft.PowerShell_profile.ps1")
-		case "darwin":
-			fmt.Print("This is untested on macos with powershell core")
-			return filepath.Join(dir, ".config", "powershell", "Microsoft.PowerShell_profile.ps1")
-		}
-
-	}
-	return filepath.Join(myDocuments, "PowerShell", "Microsoft.PowerShell_profile.ps1")
 }

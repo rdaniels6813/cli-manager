@@ -119,7 +119,10 @@ func handlePowershellCompletion(generate bool, install bool, core bool) {
 		break
 	case install:
 		profileHelper := shell.ProfileHelper{}
-		scriptPath := profileHelper.GetPowershellProfilePath(core)
+		scriptPath, err := profileHelper.GetPowershellProfilePath(core)
+		if err != nil {
+			log.Fatal(err)
+		}
 		wrote, err := writeShellSnippet(powershellCompletionSnippet, scriptPath)
 		if err != nil {
 			log.Fatal(err)
