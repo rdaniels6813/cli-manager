@@ -8,14 +8,17 @@ import (
 
 	"github.com/rdaniels6813/cli-manager/pkg/nodeman"
 	"github.com/rdaniels6813/cli-manager/pkg/shell"
+	"github.com/spf13/afero"
 )
 
 func NewZshGenerator() Generator {
-	return &ZshGenerator{}
+	return &ZshGenerator{
+		NodeManager: nodeman.NewManager(afero.NewOsFs()),
+	}
 }
 
 type ZshGenerator struct {
-	NodeManager nodeman.Manager
+	NodeManager *nodeman.Manager
 }
 
 func (g *ZshGenerator) Generate() string {
