@@ -1,0 +1,32 @@
+name: Go
+on: [push]
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.12
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.12
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
+
+    - name: Lint
+      run: |
+        # Install golangci-lint if it's not already installed
+        command -v golangci-lint || curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b `go env GOPATH`/bin v1.17.1
+        golangci-lint run
+
+    - name: Test
+      run: go test -coverprofile=coverage.txt -covermode=atomic ./...
+
+    - name: Build
+      run: |
+        GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.Version=${{ github.ref }}" -o bin/cli-manager-darwin-amd64 cmd/cli/main.go
+        GOOS=windows GOARCH=amd64 go build -ldflags "-X main.Version=${{ github.ref }}" -o bin/cli-manager-windows-amd64.exe cmd/cli/main.go
+        GOOS=linux GOARCH=amd64 go build -ldflags "-X main.Version=${{ github.ref }}" -o bin/cli-manager-linux-amd64 cmd/cli/main.go
