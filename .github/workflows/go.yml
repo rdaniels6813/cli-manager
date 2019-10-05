@@ -20,7 +20,7 @@ jobs:
       run: |
         # Install golangci-lint if it's not already installed
         command -v golangci-lint || curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b `go env GOPATH`/bin v1.17.1
-        golangci-lint run
+        /home/runner/go/bin/golangci-lint run
 
     - name: Test
       run: go test -coverprofile=coverage.txt -covermode=atomic ./...
