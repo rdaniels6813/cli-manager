@@ -47,7 +47,7 @@ type NpmViewResponse struct {
 func (n *NpmViewResponse) GetBins() map[string]string {
 	if binString, ok := n.Bin.(string); ok {
 		result := make(map[string]string, 1)
-		result[binString] = binString
+		result[filepath.Base(binString)] = binString
 		return result
 	}
 	if binMap, ok := n.Bin.(map[string]string); ok {
