@@ -1,3 +1,17 @@
+# [1.1.0](https://github.com/rdaniels6813/cli-manager/compare/v1.0.2...v1.1.0) (2020-09-30)
+
+
+### Bug Fixes
+
+* add github credentials to semantic-release ([48f9693](https://github.com/rdaniels6813/cli-manager/commit/48f9693be1717cbecf056af8cd727f3500ef9e22))
+* remove circleci and fix github action build ([9f643a2](https://github.com/rdaniels6813/cli-manager/commit/9f643a29281ee859a4cb5fcfae17fbd5fc4fa609))
+* updates to CI ([39f91c4](https://github.com/rdaniels6813/cli-manager/commit/39f91c4bf983875f137056382180e2738a6d2a97))
+
+
+### Features
+
+* upgrade go version to 1.15 ([b634a7f](https://github.com/rdaniels6813/cli-manager/commit/b634a7fa6a10b8cdd98e4d0ef7617f7119e2803d))
+
 ## [1.0.2](https://github.com/rdaniels6813/cli-manager/compare/v1.0.1...v1.0.2) (2019-08-22)
 
 
