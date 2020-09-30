@@ -22,7 +22,7 @@ func newServer() *httptest.Server {
 func newOauthServer(token string) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintln(w, fmt.Sprintf(`{"token":"%s"}`, token))
+		fmt.Fprintf(w, `{"token":"%s"}\n`, token)
 	}))
 }
 func newOauthServerWithResponse(statusCode int, response string) *httptest.Server {

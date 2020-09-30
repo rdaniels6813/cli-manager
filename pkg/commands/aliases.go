@@ -49,7 +49,6 @@ func handleZshAliases(generate bool, install bool) {
 		for _, app := range apps {
 			fmt.Printf("alias %s='cli-manager run %s'\n", app, app)
 		}
-		break
 	case install:
 		dir, err := os.UserHomeDir()
 		if err != nil {
@@ -65,7 +64,6 @@ func handleZshAliases(generate bool, install bool) {
 		} else {
 			fmt.Printf("Aliases already installed in: %s\n", scriptPath)
 		}
-		break
 	default:
 		fmt.Printf("Add the following line to your .zshrc file:\n\n%s", zshAliasesSnippet)
 	}
@@ -79,7 +77,6 @@ func handleBashAliases(generate bool, install bool) {
 		for _, app := range apps {
 			fmt.Printf("alias %s='cli-manager run %s'\n", app, app)
 		}
-		break
 	case install:
 		dir, err := os.UserHomeDir()
 		if err != nil {
@@ -95,7 +92,6 @@ func handleBashAliases(generate bool, install bool) {
 		} else {
 			fmt.Printf("Aliases already installed in: %s\n", scriptPath)
 		}
-		break
 	default:
 		fmt.Printf("Add the following line to your .bashrc or .profile file:\n\n%s", bashAliasesSnippet)
 	}
@@ -109,7 +105,6 @@ func handlePowershellAliases(generate bool, install bool, core bool) {
 		for _, app := range apps {
 			fmt.Printf("function %s { cli-manager.exe run %s @args }", app, app)
 		}
-		break
 	case install:
 		scriptPath := getPowershellProfilePath(core)
 		wrote, err := writeShellSnippet(powershellAliasesSnippet, scriptPath)
@@ -121,7 +116,6 @@ func handlePowershellAliases(generate bool, install bool, core bool) {
 		} else {
 			fmt.Printf("Aliases already installed in: %s\n", scriptPath)
 		}
-		break
 	default:
 		fmt.Printf("Add the following line to your $PROFILE file:\n\n%s", powershellAliasesSnippet)
 	}

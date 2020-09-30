@@ -33,8 +33,11 @@ func (n *nodeLTSSchedule) isLTS() bool {
 }
 
 // GetLatestNodeVersion gets the latest even numbered node version
-func GetLatestNodeVersion() string {
-	releases := getNodeReleases()
+func GetLatestNodeVersion() (string, error) {
+	releases, err := getNodeReleases()
+	if err != nil {
+		return "", err
+	}
 	latest, _ := semver.NewVersion("8")
 	for _, schedule := range *releases {
 		version, err := semver.NewVersion(schedule.Version)
@@ -45,17 +48,20 @@ func GetLatestNodeVersion() string {
 			latest = version
 		}
 	}
-	return latest.String()
+	return latest.String(), nil
 }
 
 // GetNodeVersionByRangeOrLTS return the latest matching node version in the range,
 // or the latest LTS version if the range is invalid
-func GetNodeVersionByRangeOrLTS(engine string) string {
+func GetNodeVersionByRangeOrLTS(engine string) (string, error) {
 	versionRange, err := semver.NewConstraint(engine)
 	if err != nil {
 		return GetLatestNodeVersion()
 	}
-	releases := getNodeReleases()
+	releases, err := getNodeReleases()
+	if err != nil {
+		return "", err
+	}
 	latest, _ := semver.NewVersion("8")
 	for _, schedule := range *releases {
 		version, err := semver.NewVersion(schedule.Version)
@@ -66,12 +72,15 @@ func GetNodeVersionByRangeOrLTS(engine string) string {
 			latest = version
 		}
 	}
-	return latest.String()
+	return latest.String(), nil
 }
 
 // GetLatestLTSNodeVersion gets the latest LTS version of node.js
-func GetLatestLTSNodeVersion() string {
-	releases := getNodeReleases()
+func GetLatestLTSNodeVersion() (string, error) {
+	releases, err := getNodeReleases()
+	if err != nil {
+		return "", err
+	}
 	latest, _ := semver.NewVersion("8")
 	for _, schedule := range *releases {
 		version, err := semver.NewVersion(schedule.Version)
@@ -82,10 +91,10 @@ func GetLatestLTSNodeVersion() string {
 			latest = version
 		}
 	}
-	return latest.String()
+	return latest.String(), nil
 }
 
-func getNodeReleases() *[]nodeLTSSchedule {
+func getNodeReleases() (*[]nodeLTSSchedule, error) {
 	jsonURL := "https://nodejs.org/dist/index.json"
 	req, err := http.NewRequest("GET", jsonURL, nil)
 	if err != nil {
@@ -99,7 +108,7 @@ func getNodeReleases() *[]nodeLTSSchedule {
 	var jsonSchedules []nodeLTSSchedule
 	err = json.NewDecoder(resp.Body).Decode(&jsonSchedules)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return &jsonSchedules
+	return &jsonSchedules, nil
 }

@@ -54,7 +54,6 @@ func handleZshCompletion(generate bool, install bool) {
 		}
 		output, _ := ioutil.ReadAll(buf)
 		fmt.Print(strings.TrimPrefix(string(output), "#"))
-		break
 	case install:
 		dir, err := os.UserHomeDir()
 		if err != nil {
@@ -70,7 +69,6 @@ func handleZshCompletion(generate bool, install bool) {
 		} else {
 			fmt.Printf("Completion already installed in: %s\n", scriptPath)
 		}
-		break
 	default:
 		fmt.Printf("Add the following line to your .zshrc file:\n\n%s", zshCompletionSnippet)
 	}
@@ -83,7 +81,6 @@ func handleBashCompletion(generate bool, install bool) {
 		if err != nil {
 			fmt.Println(err)
 		}
-		break
 	case install:
 		dir, err := os.UserHomeDir()
 		if err != nil {
@@ -99,7 +96,6 @@ func handleBashCompletion(generate bool, install bool) {
 		} else {
 			fmt.Printf("Completion already installed in: %s\n", scriptPath)
 		}
-		break
 	default:
 		fmt.Printf("Add the following line to your .bashrc or .profile file:\n\n%s", bashCompletionSnippet)
 	}
@@ -112,7 +108,6 @@ func handlePowershellCompletion(generate bool, install bool, core bool) {
 		if err != nil {
 			fmt.Println(err)
 		}
-		break
 	case install:
 		scriptPath := getPowershellProfilePath(core)
 		wrote, err := writeShellSnippet(powershellCompletionSnippet, scriptPath)
@@ -124,7 +119,6 @@ func handlePowershellCompletion(generate bool, install bool, core bool) {
 		} else {
 			fmt.Printf("Completion already installed in: %s\n", scriptPath)
 		}
-		break
 	default:
 		fmt.Printf("Add the following line to your $PROFILE file:\n\n%s", powershellCompletionSnippet)
 	}
@@ -205,23 +199,23 @@ func getPowershellProfilePath(core bool) string {
 
 func writeShellSnippet(snippet string, path string) (bool, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		err := os.MkdirAll(filepath.Dir(path), 777)
+		err := os.MkdirAll(filepath.Dir(path), 0777)
 		if err != nil {
 			return false, err
 		}
 		f, err := os.Create(path)
-		defer f.Close()
 		if err != nil {
 			return false, err
 		}
+		defer f.Close()
 		_, err = f.WriteString(snippet)
 		return true, err
 	}
 	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
-	defer f.Close()
 	if err != nil {
 		return false, err
 	}
+	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		text := scanner.Text()

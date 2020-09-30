@@ -51,13 +51,16 @@ func (m *Manager) GetInstalledExecutables() []string {
 }
 
 // GetNode Ensures the node binary is downloaded & extracted and returns the path to the bin folder
-func (m *Manager) GetNode(version string) Node {
+func (m *Manager) GetNode(version string) (Node, error) {
 	destinationPath := m.getNodeOutputFolder(version)
 	if _, err := m.os.Stat(destinationPath); os.IsNotExist(err) {
-		archivePath := m.downloadNodeArchive(version)
+		archivePath, err := m.downloadNodeArchive(version)
+		if err != nil {
+			return nil, err
+		}
 		m.unpackNodeArchive(archivePath, version)
 	}
-	return newNode(destinationPath)
+	return newNode(destinationPath), nil
 }
 
 // GetNodeByPath uses the binpath to set up a node helper
@@ -125,7 +128,7 @@ func (m *Manager) GetCommandPath(bin string) (string, error) {
 			if runtime.GOOS == windows {
 				return filepath.Join(v.Path, fmt.Sprintf("%s.cmd", k)), nil
 			}
-			return filepath.Join(v.Path, fmt.Sprintf("%s", k)), nil
+			return filepath.Join(v.Path, k), nil
 		}
 	}
 	return "", fmt.Errorf("%s is not installed", bin)
@@ -192,10 +195,10 @@ func (m *Manager) MarkInstalled(app string, bins map[string]string, binpath stri
 
 func saveConfig(path string, config map[string]*CLIApp) error {
 	f, err := os.Create(path)
-	defer f.Close()
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 	err = json.NewEncoder(f).Encode(config)
 	if err != nil {
 		return err
@@ -205,10 +208,10 @@ func saveConfig(path string, config map[string]*CLIApp) error {
 
 func loadConfig(path string) map[string]*CLIApp {
 	f, err := os.Open(path)
-	defer f.Close()
 	if err != nil {
 		return make(map[string]*CLIApp)
 	}
+	defer f.Close()
 	var result map[string]*CLIApp
 	err = json.NewDecoder(f).Decode(&result)
 	if err != nil {
@@ -229,31 +232,31 @@ func (m *Manager) getNodeBaseFolder() string {
 	return nodeFolder
 }
 
-func (m *Manager) downloadNodeArchive(version string) string {
+func (m *Manager) downloadNodeArchive(version string) (string, error) {
 	nodeBaseFolder := m.getNodeBaseFolder()
 	// Create the file
 	nodeBinaryPath := filepath.Join(nodeBaseFolder, filepath.Base(m.getNodeURL(version)))
 	if _, err := m.os.Stat(nodeBinaryPath); os.IsNotExist(err) {
 		out, err := os.Create(nodeBinaryPath)
 		if err != nil {
-			log.Fatalf("Failed to create destination file for node binary: %v", err)
+			return "", fmt.Errorf("Failed to create destination file for node binary: %w", err)
 		}
 		defer out.Close()
 
 		// Get the data
 		resp, err := http.Get(m.getNodeURL(version))
 		if err != nil {
-			log.Fatalf("Failed download node binary: %v", err)
+			return "", fmt.Errorf("Failed download node binary: %w", err)
 		}
 		defer resp.Body.Close()
 
 		// Write the body to file
 		_, err = io.Copy(out, resp.Body)
 		if err != nil {
-			log.Fatalf("Failed write node binary: %v", err)
+			return "", fmt.Errorf("Failed write node binary: %w", err)
 		}
 	}
-	return nodeBinaryPath
+	return nodeBinaryPath, nil
 }
 func (m *Manager) getNodeOutputFolder(version string) string {
 	nodeFolder := m.getNodeBaseFolder()

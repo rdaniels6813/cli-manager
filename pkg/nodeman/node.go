@@ -41,12 +41,25 @@ func (n *nodeImpl) Npm(args ...string) error {
 type NpmViewResponse struct {
 	Name    string            `json:"name"`
 	Engines map[string]string `json:"engines"`
-	Bin     map[string]string `json:"bin"`
+	Bin     interface{}       `json:"bin"`
+}
+
+func (n *NpmViewResponse) GetBins() map[string]string {
+	if binString, ok := n.Bin.(string); ok {
+		result := make(map[string]string, 1)
+		result[binString] = binString
+		return result
+	}
+	if binMap, ok := n.Bin.(map[string]string); ok {
+		return binMap
+	}
+	return nil
 }
 
 // Npm execute a command using npm with the following arguments `npm args[0] args[1] ...` returning results as JSON
 func (n *nodeImpl) NpmView(packageString string) (*NpmViewResponse, error) {
-	cmd := exec.Command(n.getNpmPath())
+	// This command runs a local node version based on a calculated path.
+	cmd := exec.Command(n.getNpmPath()) //nolint:gosec
 	cmd.Args = append(cmd.Args, "view", packageString)
 	cmd.Args = append(cmd.Args, "--json")
 	output, err := cmd.Output()

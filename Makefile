@@ -1,5 +1,8 @@
 binary_name=cli-manager
-golangci_lint_version=1.17.1
+golangci_lint_version=1.31.0
+
+macos:
+	GOOS=darwin GOARCH=amd64 go build -o bin/$(binary_name)-darwin-amd64 cmd/cli/main.go
 
 build:
 	GOOS=darwin GOARCH=amd64 go build -o bin/$(binary_name)-darwin-amd64 cmd/cli/main.go

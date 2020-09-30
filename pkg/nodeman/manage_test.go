@@ -7,7 +7,7 @@ import (
 func TestGetNode(t *testing.T) {
 	// fs := afero.NewMemMapFs()
 	// app := nodeman.NewManager(fs)
-	//app.GetNode()
+	// app.GetNode()
 	// homedir, _ := os.UserHomeDir()
 	// stat, err := fs.Stat(filepath.Join(homedir, ".cli-manager", "node"))
 	// assert.Nil(t, err)
