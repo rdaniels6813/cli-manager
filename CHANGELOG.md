@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/rdaniels6813/cli-manager/compare/v1.1.0...v1.2.0) (2020-09-30)
+
+
+### Features
+
+* shorten direct paths to bin to just bin name ([be35132](https://github.com/rdaniels6813/cli-manager/commit/be35132661e1891bdba190072b750e228c687ab2))
+
 # [1.1.0](https://github.com/rdaniels6813/cli-manager/compare/v1.0.2...v1.1.0) (2020-09-30)
 
 
