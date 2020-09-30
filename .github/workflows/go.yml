@@ -36,3 +36,5 @@ jobs:
     
     - name: Alpine Semantic Releaser
       uses: rdaniels6813/semantic-release-alpine@v1.2.4
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
