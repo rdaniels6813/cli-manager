@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/rdaniels6813/cli-manager/compare/v1.2.0...v1.2.1) (2020-09-30)
+
+
+### Bug Fixes
+
+* fix a bug with bin map being map[string]interface{} ([8c15e16](https://github.com/rdaniels6813/cli-manager/commit/8c15e1647d68d73afc8cc51bf8988466caed6820))
+
 # [1.2.0](https://github.com/rdaniels6813/cli-manager/compare/v1.1.0...v1.2.0) (2020-09-30)
 
 
