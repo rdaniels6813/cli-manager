@@ -25,7 +25,10 @@ var installCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 		output, _ := node.NpmView(args[0])
-		engine := output.Engines["node"]
+		engine, err := cmd.Flags().GetString("node-version")
+		if err != nil {
+			engine = output.Engines["node"]
+		}
 		version, err := nodeman.GetNodeVersionByRangeOrLTS(engine)
 		if err != nil {
 			log.Fatal(err)
@@ -46,5 +49,6 @@ var installCmd = &cobra.Command{
 }
 
 func init() {
+	installCmd.Flags().StringP("node-version", "n", "", "Specify a node version to use for install: --node-version 12.x")
 	rootCmd.AddCommand(installCmd)
 }

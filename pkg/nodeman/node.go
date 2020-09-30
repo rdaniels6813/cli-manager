@@ -53,6 +53,13 @@ func (n *NpmViewResponse) GetBins() map[string]string {
 	if binMap, ok := n.Bin.(map[string]string); ok {
 		return binMap
 	}
+	if interfaceMap, ok := n.Bin.(map[string]interface{}); ok {
+		result := make(map[string]string, len(interfaceMap))
+		for k, v := range interfaceMap {
+			result[k] = v.(string)
+		}
+		return result
+	}
 	return nil
 }
 
