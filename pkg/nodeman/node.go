@@ -163,12 +163,18 @@ func (n *nodeImpl) getNodePath() string {
 	if runtime.GOOS == WINDOWS {
 		return filepath.Join(n.nodePath, "node.exe")
 	}
+	if strings.HasSuffix(n.nodePath, "/bin") {
+		return filepath.Join(n.nodePath, "node")
+	}
 	return filepath.Join(n.nodePath, "bin/node")
 }
 
 func (n *nodeImpl) getNpmPath() string {
 	if runtime.GOOS == WINDOWS {
 		return filepath.Join(n.nodePath, "npm.cmd")
+	}
+	if strings.HasSuffix(n.nodePath, "/bin") {
+		return filepath.Join(n.nodePath, "npm")
 	}
 	return filepath.Join(n.nodePath, "bin/npm")
 }
