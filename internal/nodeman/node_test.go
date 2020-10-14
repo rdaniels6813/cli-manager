@@ -3,7 +3,7 @@ package nodeman_test
 import (
 	"testing"
 
-	"github.com/rdaniels6813/cli-manager/pkg/nodeman"
+	"github.com/rdaniels6813/cli-manager/internal/nodeman"
 	"github.com/stretchr/testify/assert"
 )
 

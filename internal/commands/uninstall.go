@@ -3,7 +3,7 @@ package cmd
 import (
 	"log"
 
-	"github.com/rdaniels6813/cli-manager/pkg/nodeman"
+	"github.com/rdaniels6813/cli-manager/internal/nodeman"
 	"github.com/spf13/afero"
 
 	"github.com/spf13/cobra"

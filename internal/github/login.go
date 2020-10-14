@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/rdaniels6813/cli-manager/pkg/promptui"
+	"github.com/rdaniels6813/cli-manager/internal/promptui"
 )
 
 // API api struct for logging into github and retrieving a new personal access token
