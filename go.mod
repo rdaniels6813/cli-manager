@@ -3,8 +3,8 @@ module github.com/rdaniels6813/cli-manager
 go 1.15
 
 require (
-	github.com/Masterminds/semver v1.4.2
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d // indirect
+	github.com/blang/semver/v4 v4.0.0
 	github.com/golang/mock v1.3.1
 	github.com/manifoldco/promptui v0.3.2
 	github.com/mholt/archiver v0.0.0-20190623220050-33320f6f7306

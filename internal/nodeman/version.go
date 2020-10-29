@@ -2,12 +2,17 @@ package nodeman
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
-	"github.com/Masterminds/semver"
+	"github.com/blang/semver/v4"
 )
 
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
 type nodeLTSSchedule struct {
 	Version  string   `json:"version"`
 	Date     string   `json:"date"`
@@ -33,18 +38,18 @@ func (n *nodeLTSSchedule) isLTS() bool {
 }
 
 // GetLatestNodeVersion gets the latest even numbered node version
-func GetLatestNodeVersion() (string, error) {
-	releases, err := getNodeReleases()
+func GetLatestNodeVersion(client HTTPClient) (string, error) {
+	releases, err := getNodeReleases(client)
 	if err != nil {
 		return "", err
 	}
-	latest, _ := semver.NewVersion("8")
+	latest, _ := parseSemver("8")
 	for _, schedule := range *releases {
-		version, err := semver.NewVersion(schedule.Version)
+		version, err := parseSemver(schedule.Version)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if version.Major()%2 == 0 && latest.LessThan(version) {
+		if version.Major%2 == 0 && latest.LT(version) {
 			latest = version
 		}
 	}
@@ -53,22 +58,23 @@ func GetLatestNodeVersion() (string, error) {
 
 // GetNodeVersionByRangeOrLTS return the latest matching node version in the range,
 // or the latest LTS version if the range is invalid
-func GetNodeVersionByRangeOrLTS(engine string) (string, error) {
-	versionRange, err := semver.NewConstraint(engine)
+func GetNodeVersionByRangeOrLTS(engine string, client HTTPClient) (string, error) {
+	versionRange, err := semver.ParseRange(engine)
 	if err != nil {
-		return GetLatestNodeVersion()
+		fmt.Printf("Error parsing engines range: %s\nUsing latest LTS\n", engine)
+		return GetLatestNodeVersion(client)
 	}
-	releases, err := getNodeReleases()
+	releases, err := getNodeReleases(client)
 	if err != nil {
 		return "", err
 	}
-	latest, _ := semver.NewVersion("8")
+	latest, _ := parseSemver("8")
 	for _, schedule := range *releases {
-		version, err := semver.NewVersion(schedule.Version)
+		version, err := parseSemver(schedule.Version)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if version.Major()%2 == 0 && latest.LessThan(version) && versionRange.Check(version) {
+		if version.Major%2 == 0 && latest.LT(version) && versionRange(version) {
 			latest = version
 		}
 	}
@@ -76,14 +82,14 @@ func GetNodeVersionByRangeOrLTS(engine string) (string, error) {
 }
 
 // GetLatestLTSNodeVersion gets the latest LTS version of node.js
-func GetLatestLTSNodeVersion() (string, error) {
-	releases, err := getNodeReleases()
+func GetLatestLTSNodeVersion(client HTTPClient) (string, error) {
+	releases, err := getNodeReleases(client)
 	if err != nil {
 		return "", err
 	}
-	latest, _ := semver.NewVersion("8")
+	latest, _ := parseSemver("8")
 	for _, schedule := range *releases {
-		version, err := semver.NewVersion(schedule.Version)
+		version, err := parseSemver(schedule.Version)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -94,13 +100,13 @@ func GetLatestLTSNodeVersion() (string, error) {
 	return latest.String(), nil
 }
 
-func getNodeReleases() (*[]nodeLTSSchedule, error) {
+func getNodeReleases(client HTTPClient) (*[]nodeLTSSchedule, error) {
 	jsonURL := "https://nodejs.org/dist/index.json"
 	req, err := http.NewRequest("GET", jsonURL, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -111,4 +117,8 @@ func getNodeReleases() (*[]nodeLTSSchedule, error) {
 		return nil, err
 	}
 	return &jsonSchedules, nil
+}
+
+func parseSemver(v string) (semver.Version, error) {
+	return semver.Parse(strings.TrimPrefix(v, "v"))
 }
