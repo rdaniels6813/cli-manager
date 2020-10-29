@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/rdaniels6813/cli-manager/compare/v1.2.1...v1.2.2) (2020-10-29)
+
+
+### Bug Fixes
+
+* use better version parser for engines.node range ([bd15dac](https://github.com/rdaniels6813/cli-manager/commit/bd15dac823a578a166eaf9c011bd8ecad403e3f6))
+
 ## [1.2.1](https://github.com/rdaniels6813/cli-manager/compare/v1.2.0...v1.2.1) (2020-09-30)
 
 
