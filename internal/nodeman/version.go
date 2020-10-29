@@ -61,7 +61,9 @@ func GetLatestNodeVersion(client HTTPClient) (string, error) {
 func GetNodeVersionByRangeOrLTS(engine string, client HTTPClient) (string, error) {
 	versionRange, err := semver.ParseRange(engine)
 	if err != nil {
-		fmt.Printf("Error parsing engines range: %s\nUsing latest LTS\n", engine)
+		if engine != "" {
+			fmt.Printf("Error parsing engines range: %s\nUsing latest LTS\n", engine)
+		}
 		return GetLatestNodeVersion(client)
 	}
 	releases, err := getNodeReleases(client)

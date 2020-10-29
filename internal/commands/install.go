@@ -27,7 +27,7 @@ var installCmd = &cobra.Command{
 		}
 		output, _ := node.NpmView(args[0])
 		engine, err := cmd.Flags().GetString("node-version")
-		if err != nil {
+		if err != nil || engine == "" {
 			engine = output.Engines["node"]
 		}
 		version, err := nodeman.GetNodeVersionByRangeOrLTS(engine, http.DefaultClient)
