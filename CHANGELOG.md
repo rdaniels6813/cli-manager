@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/rdaniels6813/cli-manager/compare/v1.2.2...v1.2.3) (2020-10-29)
+
+
+### Bug Fixes
+
+* more bugfixes around engines.node ([b4d0263](https://github.com/rdaniels6813/cli-manager/commit/b4d02630b5a76f774639f7d940c477adb927f451))
+
 ## [1.2.2](https://github.com/rdaniels6813/cli-manager/compare/v1.2.1...v1.2.2) (2020-10-29)
 
 
