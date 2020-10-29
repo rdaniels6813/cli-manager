@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"log"
+	"net/http"
 
-	"github.com/rdaniels6813/cli-manager/pkg/nodeman"
+	"github.com/rdaniels6813/cli-manager/internal/nodeman"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
@@ -15,7 +16,7 @@ var installCmd = &cobra.Command{
 	Long:  `Install a CLI application for local use.`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		nodeVersion, err := nodeman.GetLatestNodeVersion()
+		nodeVersion, err := nodeman.GetLatestNodeVersion(http.DefaultClient)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -29,7 +30,7 @@ var installCmd = &cobra.Command{
 		if err != nil {
 			engine = output.Engines["node"]
 		}
-		version, err := nodeman.GetNodeVersionByRangeOrLTS(engine)
+		version, err := nodeman.GetNodeVersionByRangeOrLTS(engine, http.DefaultClient)
 		if err != nil {
 			log.Fatal(err)
 		}

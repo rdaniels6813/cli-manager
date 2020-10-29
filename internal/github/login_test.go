@@ -9,8 +9,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/rdaniels6813/cli-manager/pkg/github"
-	"github.com/rdaniels6813/cli-manager/pkg/promptui"
+	"github.com/rdaniels6813/cli-manager/internal/github"
+	"github.com/rdaniels6813/cli-manager/internal/promptui"
 )
 
 func newServer() *httptest.Server {
