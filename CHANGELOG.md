@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/rdaniels6813/cli-manager/compare/v1.2.3...v1.2.4) (2020-11-20)
+
+
+### Bug Fixes
+
+* allow running commands to capture sigint ([a49c9cd](https://github.com/rdaniels6813/cli-manager/commit/a49c9cdb01365647885baa9251485037881d8631))
+
 ## [1.2.3](https://github.com/rdaniels6813/cli-manager/compare/v1.2.2...v1.2.3) (2020-10-29)
 
 
