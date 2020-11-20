@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/rdaniels6813/cli-manager/internal/nodeman"
 	"github.com/spf13/afero"
@@ -18,12 +19,14 @@ var installCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		nodeVersion, err := nodeman.GetLatestNodeVersion(http.DefaultClient)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		nodeManager := nodeman.NewManager(afero.NewOsFs())
 		node, err := nodeManager.GetNode(nodeVersion)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		output, _ := node.NpmView(args[0])
 		engine, err := cmd.Flags().GetString("node-version")
@@ -32,19 +35,23 @@ var installCmd = &cobra.Command{
 		}
 		version, err := nodeman.GetNodeVersionByRangeOrLTS(engine, http.DefaultClient)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		installNode, err := nodeManager.GetNode(version)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		err = installNode.Npm("install", "-g", args[0])
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		err = nodeManager.MarkInstalled(output.Name, output.GetBins(), installNode.BinPath(), args[0])
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 	},
 }

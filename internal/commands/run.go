@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"os/exec"
+	"os/signal"
 
 	"github.com/rdaniels6813/cli-manager/internal/nodeman"
 	"github.com/spf13/afero"
@@ -24,16 +25,33 @@ var runCmd = &cobra.Command{
 		manager := nodeman.NewManager(afero.NewOsFs())
 		commandPath, err := manager.GetCommandPath(command)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
-		runCommand := exec.Command(commandPath, remainingArgs...)
-		manager.ConfigureNodeOnCommand(command, runCommand)
-		runCommand.Stdout = os.Stdout
-		runCommand.Stdin = os.Stdin
-		runCommand.Stderr = os.Stderr
-		err = runCommand.Run()
+		c := exec.Command(commandPath, remainingArgs...)
+		manager.ConfigureNodeOnCommand(command, c)
+		c.Stdout = os.Stdout
+		c.Stdin = os.Stdin
+		c.Stderr = os.Stderr
+		if err := c.Start(); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		done := false
+		notif := make(chan os.Signal, 1)
+		signal.Notify(notif, os.Interrupt)
+		go func() {
+			for range notif {
+				if done {
+					os.Exit(0)
+				}
+			}
+		}()
+		err = c.Wait()
+		done = true
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 	},
 }

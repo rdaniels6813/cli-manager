@@ -2,9 +2,10 @@ package nodeman_test
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/rdaniels6813/cli-manager/internal/nodeman"
@@ -30,7 +31,8 @@ var tests = map[string]string{
 func getNodeSchedule() []byte {
 	defaultBody, err := ioutil.ReadFile("./node-schedule.json")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	return defaultBody
 }

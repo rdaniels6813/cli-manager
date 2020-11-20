@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -105,7 +104,8 @@ func (m *Manager) getNodeURL(version string) string {
 func (m *Manager) getCliManagerFolder() string {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal("There was an error determining the user home directory")
+		fmt.Println("There was an error determining the user home directory")
+		os.Exit(1)
 	}
 	cliManagerDir := filepath.Join(homeDir, ".cli-manager")
 	if _, err := m.os.Stat(cliManagerDir); os.IsNotExist(err) {
@@ -139,7 +139,8 @@ func (m *Manager) GetCommandPath(bin string) (string, error) {
 func (m *Manager) ConfigureNodeOnCommand(command string, cmd *exec.Cmd) {
 	nodeBinPath, err := m.GetCommandNodeBinPath(command)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	env := make([]string, 0, len(os.Environ()))
 	for _, val := range os.Environ() {
@@ -267,26 +268,31 @@ func (m *Manager) unpackNodeArchive(path string, version string) {
 	outputFolder := m.getNodeOutputFolder(version)
 	err := archiver.Unarchive(path, outputFolder)
 	if err != nil {
-		log.Fatalf("Failed to unarchive: %s", err)
+		fmt.Printf("Failed to unarchive: %s", err)
+		os.Exit(1)
 	}
 	dirs, err := ioutil.ReadDir(outputFolder)
 	if err != nil {
-		log.Fatalf("Failed to read dir: %v", err)
+		fmt.Printf("Failed to read dir: %v", err)
+		os.Exit(1)
 	}
 	dirName := filepath.Join(outputFolder, dirs[0].Name())
 	tmpPath, err := ioutil.TempDir(m.getNodeBaseFolder(), version)
 	os.Remove(tmpPath)
 	if err != nil {
-		log.Fatalf("Failed to get temp dir: %v", err)
+		fmt.Printf("Failed to get temp dir: %v", err)
+		os.Exit(1)
 	}
 	err = os.Rename(dirName, tmpPath)
 	if err != nil {
-		log.Fatalf("Failed to rename dir: %v", err)
+		fmt.Printf("Failed to rename dir: %v", err)
+		os.Exit(1)
 	}
 	os.Remove(outputFolder)
 	err = os.Rename(tmpPath, outputFolder)
 	if err != nil {
-		log.Fatalf("Failed to rename archive paths: %s", err)
+		fmt.Printf("Failed to rename archive paths: %s", err)
+		os.Exit(1)
 	}
 	os.Remove(path)
 }

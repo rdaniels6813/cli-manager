@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -34,7 +33,8 @@ var completionCmd = &cobra.Command{
 		case PowershellCore:
 			handlePowershellCompletion(gen, install, true)
 		case Unknown:
-			log.Fatal("Unknown shell, please specify your shell using flags")
+			fmt.Println("Unknown shell, please specify your shell using flags")
+			os.Exit(1)
 		}
 	},
 }
@@ -57,12 +57,14 @@ func handleZshCompletion(generate bool, install bool) {
 	case install:
 		dir, err := os.UserHomeDir()
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		scriptPath := filepath.Join(dir, ".zshrc")
 		wrote, err := writeShellSnippet(zshCompletionSnippet, scriptPath)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		if wrote {
 			fmt.Printf("Wrote completion script to: %s\n", scriptPath)
@@ -84,12 +86,14 @@ func handleBashCompletion(generate bool, install bool) {
 	case install:
 		dir, err := os.UserHomeDir()
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		scriptPath := filepath.Join(dir, ".bashrc")
 		wrote, err := writeShellSnippet(bashCompletionSnippet, scriptPath)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		if wrote {
 			fmt.Printf("Wrote completion script to: %s\n", scriptPath)
@@ -112,7 +116,8 @@ func handlePowershellCompletion(generate bool, install bool, core bool) {
 		scriptPath := getPowershellProfilePath(core)
 		wrote, err := writeShellSnippet(powershellCompletionSnippet, scriptPath)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		if wrote {
 			fmt.Printf("Wrote completion script to: %s\n", scriptPath)

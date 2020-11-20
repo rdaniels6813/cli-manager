@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
+	"os"
 
 	"github.com/rdaniels6813/cli-manager/internal/nodeman"
 	"github.com/spf13/afero"
@@ -20,16 +21,18 @@ var uninstallCmd = &cobra.Command{
 		manager := nodeman.NewManager(afero.NewOsFs())
 		app, err := manager.GetCLIApp(appName)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		node := manager.GetNodeByPath(app.Path)
 		err = node.Npm("remove", "-g", app.App)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		err = manager.MarkUninstalled(app.App)
 		if err != nil {
-			log.Println(err)
+			fmt.Println(err)
 		}
 	},
 }

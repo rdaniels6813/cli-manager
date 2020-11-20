@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -105,8 +104,9 @@ func (n *nodeImpl) githubPackageJSON(packageString string) (*NpmViewResponse, er
 		return &result, err
 	}
 	if resp.StatusCode != 200 {
-		log.Fatalf("Failed to get package.json for project using: %s, please ensure you have set up your github token",
+		fmt.Printf("Failed to get package.json for project using: %s, please ensure you have set up your github token",
 			packageJSONURL)
+		os.Exit(1)
 	}
 	defer resp.Body.Close()
 	var content githubContent

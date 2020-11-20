@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -32,7 +31,8 @@ var aliasesCmd = &cobra.Command{
 		case PowershellCore:
 			handlePowershellAliases(gen, install, true)
 		case Unknown:
-			log.Fatal("Unknown shell, please specify your shell using flags")
+			fmt.Println("Unknown shell, please specify your shell using flags")
+			os.Exit(1)
 		}
 	},
 }
@@ -52,12 +52,14 @@ func handleZshAliases(generate bool, install bool) {
 	case install:
 		dir, err := os.UserHomeDir()
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		scriptPath := filepath.Join(dir, ".zshrc")
 		wrote, err := writeShellSnippet(zshAliasesSnippet, scriptPath)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		if wrote {
 			fmt.Printf("Wrote aliases script to: %s\n", scriptPath)
@@ -80,12 +82,14 @@ func handleBashAliases(generate bool, install bool) {
 	case install:
 		dir, err := os.UserHomeDir()
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		scriptPath := filepath.Join(dir, ".bashrc")
 		wrote, err := writeShellSnippet(bashAliasesSnippet, scriptPath)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		if wrote {
 			fmt.Printf("Wrote aliases script to: %s\n", scriptPath)
@@ -109,7 +113,8 @@ func handlePowershellAliases(generate bool, install bool, core bool) {
 		scriptPath := getPowershellProfilePath(core)
 		wrote, err := writeShellSnippet(powershellAliasesSnippet, scriptPath)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		if wrote {
 			fmt.Printf("Wrote aliases script to: %s\n", scriptPath)
