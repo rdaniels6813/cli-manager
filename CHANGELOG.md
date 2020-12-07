@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/rdaniels6813/cli-manager/compare/v1.3.0...v1.3.1) (2020-12-07)
+
+
+### Bug Fixes
+
+* fix issues with completion/aliases scripts ([db2d16b](https://github.com/rdaniels6813/cli-manager/commit/db2d16bd871acc2e89bb6b30fb8aef893e8d139c))
+
 # [1.3.0](https://github.com/rdaniels6813/cli-manager/compare/v1.2.6...v1.3.0) (2020-12-07)
 
 
