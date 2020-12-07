@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/rdaniels6813/cli-manager/internal/version"
 	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the install command
 var rootCmd = &cobra.Command{
-	Use:   "cli-manager",
-	Short: "Manage installation & use of various CLI applications",
-	Long:  ``,
+	Use:     "cli-manager",
+	Short:   "Manage installation & use of various CLI applications",
+	Long:    ``,
+	Version: version.GetModuleVersion(),
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

@@ -30,9 +30,9 @@ jobs:
 
     - name: Build
       run: |
-        GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.Version=${{ github.ref }}" -o bin/cli-manager-darwin-amd64 cmd/cli/main.go
-        GOOS=windows GOARCH=amd64 go build -ldflags "-X main.Version=${{ github.ref }}" -o bin/cli-manager-windows-amd64.exe cmd/cli/main.go
-        GOOS=linux GOARCH=amd64 go build -ldflags "-X main.Version=${{ github.ref }}" -o bin/cli-manager-linux-amd64 cmd/cli/main.go
+        GOOS=darwin GOARCH=amd64 go build -ldflags "-X github.com/rdaniels6813/cli-manager/internal/version.version=${{ github.ref }}" -o bin/cli-manager-darwin-amd64 cmd/cli/main.go
+        GOOS=windows GOARCH=amd64 go build -ldflags "-X github.com/rdaniels6813/cli-manager/internal/version.version=${{ github.ref }}" -o bin/cli-manager-windows-amd64.exe cmd/cli/main.go
+        GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/rdaniels6813/cli-manager/internal/version.version=${{ github.ref }}" -o bin/cli-manager-linux-amd64 cmd/cli/main.go
     
     - name: Alpine Semantic Releaser
       uses: rdaniels6813/semantic-release-alpine@v1.2.4
