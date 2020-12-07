@@ -1,3 +1,10 @@
+## [1.2.6](https://github.com/rdaniels6813/cli-manager/compare/v1.2.5...v1.2.6) (2020-12-07)
+
+
+### Bug Fixes
+
+* get next version from semantic-release run ([710e5f7](https://github.com/rdaniels6813/cli-manager/commit/710e5f7f211b0f0965d932614c7fef779cee2d7f))
+
 ## [1.2.5](https://github.com/rdaniels6813/cli-manager/compare/v1.2.4...v1.2.5) (2020-12-07)
 
 
