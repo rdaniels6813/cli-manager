@@ -39,9 +39,9 @@ var completionCmd = &cobra.Command{
 	},
 }
 
-const zshCompletionSnippet = "source <(cli-manager completion -g -z)\n"
-const bashCompletionSnippet = "source <(cli-manager completion -g -b)\n"
-const powershellCompletionSnippet = "Invoke-Expression $($(cli-manager.exe completion -g -p) -join \"`n\")\n"
+const zshCompletionSnippet = "\nsource <(cli-manager completion -g -z)\n"
+const bashCompletionSnippet = "\nsource <(cli-manager completion -g -b)\n"
+const powershellCompletionSnippet = "\nInvoke-Expression $($(cli-manager.exe completion -g -p) -join \"`n\")\n"
 
 func handleZshCompletion(generate bool, install bool) {
 	switch {
@@ -224,11 +224,11 @@ func writeShellSnippet(snippet string, path string) (bool, error) {
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		text := scanner.Text()
-		if strings.Contains(text, snippet) {
+		if strings.Contains(text, strings.TrimSpace(snippet)) {
 			return false, nil
 		}
 	}
-	_, err = f.WriteString(fmt.Sprintf("%s\n", snippet))
+	_, err = f.WriteString(snippet)
 	return true, err
 }
 
