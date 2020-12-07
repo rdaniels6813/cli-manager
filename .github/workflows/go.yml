@@ -27,14 +27,17 @@ jobs:
 
     - name: Test
       run: go test -coverprofile=coverage.txt -covermode=atomic ./...
-
-    - name: Build
-      run: |
-        GOOS=darwin GOARCH=amd64 go build -ldflags "-X github.com/rdaniels6813/cli-manager/internal/version.version=${{ github.ref }}" -o bin/cli-manager-darwin-amd64 cmd/cli/main.go
-        GOOS=windows GOARCH=amd64 go build -ldflags "-X github.com/rdaniels6813/cli-manager/internal/version.version=${{ github.ref }}" -o bin/cli-manager-windows-amd64.exe cmd/cli/main.go
-        GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/rdaniels6813/cli-manager/internal/version.version=${{ github.ref }}" -o bin/cli-manager-linux-amd64 cmd/cli/main.go
-    
     - name: Alpine Semantic Releaser
-      uses: rdaniels6813/semantic-release-alpine@v1.2.4
+      id: semantic-release
+      uses: rdaniels6813/semantic-release-alpine@v1.5.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        dry-run: true
+    - name: Build
+      env:
+        VERSION_TAG: ${{ steps.semantic-release.outputs.released-version }}
+      run: make ci    
+    - name: Alpine Semantic Releaser
+      uses: rdaniels6813/semantic-release-alpine@v1.5.0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
