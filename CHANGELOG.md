@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/rdaniels6813/cli-manager/compare/v1.2.6...v1.3.0) (2020-12-07)
+
+
+### Features
+
+* add upgrade command to upgrage to latest version ([31b0833](https://github.com/rdaniels6813/cli-manager/commit/31b08338a4241bf5ccf250b1fc9eed3cb12ea94d))
+
 ## [1.2.6](https://github.com/rdaniels6813/cli-manager/compare/v1.2.5...v1.2.6) (2020-12-07)
 
 
