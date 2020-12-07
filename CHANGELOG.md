@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/rdaniels6813/cli-manager/compare/v1.2.4...v1.2.5) (2020-12-07)
+
+
+### Bug Fixes
+
+* include version information with the CLI ([be21e1c](https://github.com/rdaniels6813/cli-manager/commit/be21e1ce96f3dad0e9e93f78672202ac2c143a34))
+
 ## [1.2.4](https://github.com/rdaniels6813/cli-manager/compare/v1.2.3...v1.2.4) (2020-11-20)
 
 
