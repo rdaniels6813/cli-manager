@@ -12,6 +12,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/rdaniels6813/cli-manager/internal/util"
 	"github.com/spf13/afero"
 
 	"github.com/mholt/archiver"
@@ -101,25 +102,9 @@ func (m *Manager) getNodeURL(version string) string {
 	return fmt.Sprintf("https://nodejs.org/dist/v%s/node-v%s-%s-%s%s", version, version, os, arch, extension)
 }
 
-func (m *Manager) getCliManagerFolder() string {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		fmt.Println("There was an error determining the user home directory")
-		os.Exit(1)
-	}
-	cliManagerDir := filepath.Join(homeDir, ".cli-manager")
-	if _, err := m.os.Stat(cliManagerDir); os.IsNotExist(err) {
-		err = m.os.MkdirAll(cliManagerDir, 0700)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-	return cliManagerDir
-}
-
 // GetCommandPath gets the path to the installed command
 func (m *Manager) GetCommandPath(bin string) (string, error) {
-	cliManagerDir := m.getCliManagerFolder()
+	cliManagerDir := util.GetCliManagerFolder(m.os)
 	installedAppsJSON := filepath.Join(cliManagerDir, "installed.json")
 	config := loadConfig(installedAppsJSON)
 
@@ -155,7 +140,7 @@ func (m *Manager) ConfigureNodeOnCommand(command string, cmd *exec.Cmd) {
 
 // GetCommandNodeBinPath returns the bin folder path to the node installation being used for the command
 func (m *Manager) GetCommandNodeBinPath(bin string) (string, error) {
-	cliManagerDir := m.getCliManagerFolder()
+	cliManagerDir := util.GetCliManagerFolder(m.os)
 	installedAppsJSON := filepath.Join(cliManagerDir, "installed.json")
 	config := loadConfig(installedAppsJSON)
 
@@ -168,7 +153,7 @@ func (m *Manager) GetCommandNodeBinPath(bin string) (string, error) {
 }
 
 func (m *Manager) getConfigPath() string {
-	cliManagerDir := m.getCliManagerFolder()
+	cliManagerDir := util.GetCliManagerFolder(m.os)
 	return filepath.Join(cliManagerDir, "installed.json")
 }
 
@@ -222,7 +207,7 @@ func loadConfig(path string) map[string]*CLIApp {
 }
 
 func (m *Manager) getNodeBaseFolder() string {
-	cliManagerDir := m.getCliManagerFolder()
+	cliManagerDir := util.GetCliManagerFolder(m.os)
 	nodeFolder := filepath.Join(cliManagerDir, "node")
 	if _, err := m.os.Stat(nodeFolder); os.IsNotExist(err) {
 		err = m.os.MkdirAll(nodeFolder, 0700)

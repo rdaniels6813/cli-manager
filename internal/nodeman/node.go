@@ -10,6 +10,9 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/rdaniels6813/cli-manager/internal/store"
+	"github.com/rdaniels6813/cli-manager/internal/token"
 )
 
 const WINDOWS = "windows"
@@ -68,8 +71,9 @@ func (n *nodeImpl) NpmView(packageString string) (*NpmViewResponse, error) {
 	cmd := exec.Command(n.getNpmPath()) //nolint:gosec
 	cmd.Args = append(cmd.Args, "view", packageString)
 	cmd.Args = append(cmd.Args, "--json")
-	output, err := cmd.Output()
+	output, err := cmd.CombinedOutput()
 	if err != nil {
+		fmt.Printf("Failed to do npm view: %s\nFalling back to github api.", output)
 		return n.githubPackageJSON(packageString)
 	}
 	var response NpmViewResponse
@@ -95,9 +99,13 @@ func (n *nodeImpl) githubPackageJSON(packageString string) (*NpmViewResponse, er
 	if err != nil {
 		return &result, err
 	}
-	token := os.Getenv("GH_TOKEN")
+	manager := token.NewConfigTokenManager(store.GetDefaultStore())
+	token, err := manager.GetNewOrSavedToken([]string{})
+	if err != nil {
+		return nil, err
+	}
 	if token != "" {
-		req.Header.Set("Authorization", fmt.Sprintf("token %s", os.Getenv("GH_TOKEN")))
+		req.Header.Set("Authorization", fmt.Sprintf("token %s", token))
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

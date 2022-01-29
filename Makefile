@@ -14,8 +14,8 @@ test:
 
 lint:
 	# Install golangci-lint if it's not already installed
-	command -v golangci-lint || curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b `go env GOPATH`/bin v$(golangci_lint_version)
-	`go env GOPATH`/bin/golangci-lint run
+	test -f .tools/golangci-lint || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .tools v$(golangci_lint_version)
+	.tools/golangci-lint run
 
 release:
 	semantic-release
