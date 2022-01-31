@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/rdaniels6813/cli-manager/compare/v1.3.1...v1.4.0) (2022-01-31)
+
+
+### Features
+
+* using token store manager ([#5](https://github.com/rdaniels6813/cli-manager/issues/5)) ([4063a02](https://github.com/rdaniels6813/cli-manager/commit/4063a0256e8ac2e15aa305eb852ce7ff030c8c69))
+
 ## [1.3.1](https://github.com/rdaniels6813/cli-manager/compare/v1.3.0...v1.3.1) (2020-12-07)
 
 
