@@ -12,32 +12,31 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-
     - name: Set up Go 1.17
       uses: actions/setup-go@v1
       with:
         go-version: 1.17
       id: go
-
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
-
     - name: Lint
       run: make lint
-
     - name: Test
       run: go test -coverprofile=coverage.txt -covermode=atomic ./...
-    - name: Alpine Semantic Releaser
-      id: semantic-release
-      uses: rdaniels6813/semantic-release-alpine@v1.5.0
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        dry-run: true
-    - name: Build
-      env:
-        VERSION_TAG: ${{ steps.semantic-release.outputs.released-version }}
-      run: make ci    
-    - name: Alpine Semantic Releaser
-      uses: rdaniels6813/semantic-release-alpine@v1.5.0
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Setup Node - Semantic Release 
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Install - Semantic Release
+        run: |
+          npm i -g semantic-release@19 \
+            @semantic-release/commit-analyzer@9 \
+            @semantic-release/release-notes-generator@10 \
+            @semantic-release/github@8 \
+            @semantic-release/exec@6 \
+            @semantic-release/changelog@6 \
+            @semantic-release/git@10
+      - name: Run - Semantic Release
+        run: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

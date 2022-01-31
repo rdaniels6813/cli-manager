@@ -5,6 +5,12 @@
     "@semantic-release/release-notes-generator",
     "@semantic-release/changelog",
     [
+      "@semantic-release/exec",
+      {
+        "publishCmd": "VERSION_TAG=${nextRelease.version} make ci"
+      }
+    ],
+    [
       "@semantic-release/github",
       {
         "assets": [
