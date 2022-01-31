@@ -28,7 +28,11 @@ var installCmd = &cobra.Command{
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		output, _ := node.NpmView(args[0])
+		output, err := node.NpmView(args[0])
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 		engine, err := cmd.Flags().GetString("node-version")
 		if err != nil || engine == "" {
 			engine = output.Engines["node"]
