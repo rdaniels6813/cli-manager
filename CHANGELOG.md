@@ -1,3 +1,11 @@
+## [1.4.1](https://github.com/rdaniels6813/cli-manager/compare/v1.4.0...v1.4.1) (2022-01-31)
+
+
+### Bug Fixes
+
+* fix syntax error in workflow ([ed67ba2](https://github.com/rdaniels6813/cli-manager/commit/ed67ba26c172e474cfc4ddb551a0899d41c25a7f))
+* update semantic-release ([b32ccf0](https://github.com/rdaniels6813/cli-manager/commit/b32ccf06987522b9bf62d337d369ba98a4cbe511))
+
 # [1.4.0](https://github.com/rdaniels6813/cli-manager/compare/v1.3.1...v1.4.0) (2022-01-31)
 
 
