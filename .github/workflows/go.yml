@@ -27,8 +27,6 @@ jobs:
         uses: arduino/setup-task@v1
       - name: Test
         run: task test
-      - name: Build
-        run: task build
       - name: Setup Node - Semantic Release
         uses: actions/setup-node@v3
         with:
