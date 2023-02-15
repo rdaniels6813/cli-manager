@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/rdaniels6813/cli-manager/compare/v1.4.1...v1.4.2) (2023-02-15)
+
+
+### Bug Fixes
+
+* upgrade to latest go version ([#6](https://github.com/rdaniels6813/cli-manager/issues/6)) ([b353d49](https://github.com/rdaniels6813/cli-manager/commit/b353d49aef88b54b3222228674492c3eef19072f))
+
 ## [1.4.1](https://github.com/rdaniels6813/cli-manager/compare/v1.4.0...v1.4.1) (2022-01-31)
 
 
