@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/rdaniels6813/cli-manager/compare/v1.4.4...v1.4.5) (2023-02-15)
+
+
+### Bug Fixes
+
+* update go.yml ([#7](https://github.com/rdaniels6813/cli-manager/issues/7)) ([b863560](https://github.com/rdaniels6813/cli-manager/commit/b863560499db495ed4f91330310e5138fbc6e3b0))
+
 ## [1.4.4](https://github.com/rdaniels6813/cli-manager/compare/v1.4.3...v1.4.4) (2023-02-15)
 
 
