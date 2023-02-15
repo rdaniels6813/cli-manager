@@ -67,10 +67,11 @@ func authFlow(oauthHost string, inputOutput *iostreams.IOStreams, notice string,
 	callbackURI := "http://127.0.0.1/callback"
 	host := oauth.GitHubHost("https://github.com")
 	flow := &oauth.Flow{
-		Host:        host,
-		ClientID:    "c6f78436de6ccad2fb30",
-		CallbackURI: callbackURI,
-		Scopes:      scopes,
+		Host:         host,
+		ClientID:     "178c6fc778ccc68e1d6a",
+		ClientSecret: "34ddeff2b558a23d38fba8a6de74f086ede1cc0b",
+		CallbackURI:  callbackURI,
+		Scopes:       scopes,
 		DisplayCode: func(code, verificationURL string) error {
 			fmt.Fprintf(w, "%s First copy your one-time code: %s\n", cs.Yellow("!"), cs.Bold(code))
 			return nil
