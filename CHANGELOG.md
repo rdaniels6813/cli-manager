@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/rdaniels6813/cli-manager/compare/v1.4.3...v1.4.4) (2023-02-15)
+
+
+### Bug Fixes
+
+* force re-build with embedded version info ([112bf7d](https://github.com/rdaniels6813/cli-manager/commit/112bf7d340223da80af267751241231eb7ee51d0))
+
 ## [1.4.3](https://github.com/rdaniels6813/cli-manager/compare/v1.4.2...v1.4.3) (2023-02-15)
 
 
