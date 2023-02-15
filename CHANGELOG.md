@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/rdaniels6813/cli-manager/compare/v1.4.2...v1.4.3) (2023-02-15)
+
+
+### Bug Fixes
+
+* update client_id and secret ([cc8e2ec](https://github.com/rdaniels6813/cli-manager/commit/cc8e2ec2068ef33c632a7341f649f685910a34f5))
+
 ## [1.4.2](https://github.com/rdaniels6813/cli-manager/compare/v1.4.1...v1.4.2) (2023-02-15)
 
 
