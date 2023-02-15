@@ -7,36 +7,37 @@ on:
     branches:
       - master
 jobs:
-
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    - name: Set up Go 1.20
-      uses: actions/setup-go@v1
-      with:
-        go-version: 1.20
-      id: go
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
-    - name: Lint
-      run: task lint
-    - name: Test
-      run: go test -coverprofile=coverage.txt -covermode=atomic ./...
-    - name: Setup Node - Semantic Release 
-      uses: actions/setup-node@v2
-      with:
-        node-version: "18"
-    - name: Install - Semantic Release
-      run: |
-        npm i -g semantic-release@19 \
-          @semantic-release/commit-analyzer@9 \
-          @semantic-release/release-notes-generator@10 \
-          @semantic-release/github@8 \
-          @semantic-release/exec@6 \
-          @semantic-release/changelog@6 \
-          @semantic-release/git@10
-    - name: Run - Semantic Release
-      run: semantic-release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Go 1.20
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.20
+        id: go
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
+      - name: Install Task
+        uses: arduino/setup-task@v1
+      - name: Lint
+        run: task lint
+      - name: Test
+        run: go test -coverprofile=coverage.txt -covermode=atomic ./...
+      - name: Setup Node - Semantic Release
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+      - name: Install - Semantic Release
+        run: |
+          npm i -g semantic-release@20 \
+            @semantic-release/commit-analyzer@9 \
+            @semantic-release/release-notes-generator@10 \
+            @semantic-release/github@8 \
+            @semantic-release/exec@6 \
+            @semantic-release/changelog@6 \
+            @semantic-release/git@10
+      - name: Run - Semantic Release
+        run: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
