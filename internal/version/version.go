@@ -12,7 +12,10 @@ func GetModuleVersion() string {
 		return version
 	}
 	if bi, exists := debug.ReadBuildInfo(); exists {
-		return bi.Main.Version
+		if bi.Main.Version != "" {
+			return bi.Main.Version
+		}
+		return "dev"
 	} else {
 		return fmt.Sprintf("No version information found. Make sure to use " +
 			"GO111MODULE=on when running 'go get' in order to use specific " +
