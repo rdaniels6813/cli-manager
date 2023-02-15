@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -52,7 +52,7 @@ func handleZshCompletion(generate bool, install bool) {
 		if err != nil {
 			fmt.Println(err)
 		}
-		output, _ := ioutil.ReadAll(buf)
+		output, _ := io.ReadAll(buf)
 		fmt.Print(strings.TrimPrefix(string(output), "#"))
 	case install:
 		dir, err := os.UserHomeDir()

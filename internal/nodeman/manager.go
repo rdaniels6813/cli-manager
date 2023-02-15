@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -256,13 +255,13 @@ func (m *Manager) unpackNodeArchive(path string, version string) {
 		fmt.Printf("Failed to unarchive: %s", err)
 		os.Exit(1)
 	}
-	dirs, err := ioutil.ReadDir(outputFolder)
+	dirs, err := os.ReadDir(outputFolder)
 	if err != nil {
 		fmt.Printf("Failed to read dir: %v", err)
 		os.Exit(1)
 	}
 	dirName := filepath.Join(outputFolder, dirs[0].Name())
-	tmpPath, err := ioutil.TempDir(m.getNodeBaseFolder(), version)
+	tmpPath, err := os.MkdirTemp(m.getNodeBaseFolder(), version)
 	os.Remove(tmpPath)
 	if err != nil {
 		fmt.Printf("Failed to get temp dir: %v", err)
