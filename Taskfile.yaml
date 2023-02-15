@@ -1,0 +1,42 @@
+version: "3"
+
+vars:
+  golangci_lint_version: 1.51.1
+  tools_dir: .tools/
+  build_os: darwin linux windows
+  build_arch: amd64 arm64
+  binary_name: cli-manager
+  repo: rdaniels6813/cli-manager
+
+tasks:
+  build:
+    cmds:
+      - |
+        for o in {{.build_os}};	do
+          for a in {{.build_arch}}; do
+            if [ ${o} == "windows" ]; then
+              extension=.exe
+            fi
+            GOOS=${o} GOARCH=${a} go build -ldflags "-X github.com/{{.repo}}/internal/version.version=${VERSION_TAG}" -o bin/{{.binary_name}}-${o}-${a}${extension} cmd/cli/main.go
+          done
+        done
+    generates:
+      - bin/*
+    sources:
+      - "**/*.go"
+  test:
+    cmds:
+      - go test -coverprofile=coverage.txt -covermode=atomic ./...
+  lint:
+    cmds:
+      - '{{.tools_dir}}golangci-lint run'
+    deps:
+      - install-tools
+  install-tools:
+    cmds:
+      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b {{.tools_dir}} v{{.golangci_lint_version}}
+    status:
+      - test -f {{.tools_dir}}golangci-lint
+  release:
+    cmds:
+      - semantic-release

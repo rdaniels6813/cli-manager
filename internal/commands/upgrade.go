@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -109,7 +108,7 @@ func getLatestReleaseBinary() (*os.File, error) {
 			if err != nil {
 				return nil, fmt.Errorf("Failed getting executable path; %w", err)
 			}
-			f, err := ioutil.TempFile(path.Dir(p), "cli-manager")
+			f, err := os.CreateTemp(path.Dir(p), "cli-manager")
 			if err != nil {
 				return nil, fmt.Errorf("Failed creating temp file; %w", err)
 			}

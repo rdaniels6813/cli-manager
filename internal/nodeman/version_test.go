@@ -3,7 +3,7 @@ package nodeman_test
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"testing"
@@ -17,7 +17,7 @@ type clientMock struct {
 
 func (c *clientMock) Do(req *http.Request) (*http.Response, error) {
 	return &http.Response{
-		Body: ioutil.NopCloser(bytes.NewReader(defaultBody)),
+		Body: io.NopCloser(bytes.NewReader(defaultBody)),
 	}, nil
 }
 
@@ -29,7 +29,7 @@ var tests = map[string]string{
 }
 
 func getNodeSchedule() []byte {
-	defaultBody, err := ioutil.ReadFile("./node-schedule.json")
+	defaultBody, err := os.ReadFile("./node-schedule.json")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

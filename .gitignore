@@ -107,3 +107,4 @@ $RECYCLE.BIN/
 main
 bin/
 .tools/
+.task/
